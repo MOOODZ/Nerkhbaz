@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.presentation.theme
+package ir.moodz.sarafkoochooloo.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

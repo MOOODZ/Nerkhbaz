@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.presentation.theme
+package ir.moodz.sarafkoochooloo.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

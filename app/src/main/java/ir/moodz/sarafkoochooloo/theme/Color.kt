@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.presentation.theme
+package ir.moodz.sarafkoochooloo.theme
 
 import androidx.compose.ui.graphics.Color
 

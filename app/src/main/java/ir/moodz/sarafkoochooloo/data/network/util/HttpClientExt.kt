@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.data.network
+package ir.moodz.sarafkoochooloo.data.network.util
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -10,61 +10,25 @@ import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
-import ir.moodz.core.data.BuildConfig
+import ir.moodz.sarafkoochooloo.BuildConfig
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
 import kotlinx.serialization.SerializationException
+import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 
-suspend inline fun <reified Response: Any> HttpClient.get(
-    route: String,
-    queryParameters: Map<String, Any?> = mapOf()
-) : Result<Response, DataError.Network>{
-    return safeCall {
-        get {
-            url(constructRoute(route))
-            queryParameters.forEach { (key, value) ->
-                parameter(key, value)
-            }
-        }
-    }
-}
-suspend inline fun <reified Response: Any> HttpClient.delete(
-    route: String,
-    queryParameters: Map<String, Any?> = mapOf()
-) : Result<Response, DataError.Network>{
-    return safeCall {
-        delete {
-            url(constructRoute(route))
-            queryParameters.forEach { (key, value) ->
-                parameter(key, value)
-            }
-        }
-    }
-}
-suspend inline fun <reified Request,reified Response: Any> HttpClient.post(
-    route: String,
-    body: Request
-) : Result<Response, DataError.Network>{
-    return safeCall {
-        post {
-            url(constructRoute(route))
-            setBody(body)
-        }
-    }
-}
 suspend inline fun <reified T> safeCall (execute: () -> HttpResponse): Result<T, DataError.Network>{
     val response = try {
         execute()
     } catch (e: UnresolvedAddressException){
-        e.printStackTrace()
+        Timber.e(e)
         return Result.Error(DataError.Network.NO_INTERNET)
     } catch (e: SerializationException){
-        e.printStackTrace()
+        Timber.e(e)
         return Result.Error(DataError.Network.SERIALIZATION)
     } catch (e: Exception){
         if (e is CancellationException) throw e
-        e.printStackTrace()
+        Timber.e(e)
         return Result.Error(DataError.Network.UNKNOWN)
     }
 
