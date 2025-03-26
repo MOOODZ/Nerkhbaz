@@ -1,39 +1,34 @@
 package ir.moodz.sarafkoochooloo.data.mapper
 
 import ir.moodz.sarafkoochooloo.data.local.entity.CurrencyEntity
-import ir.moodz.sarafkoochooloo.data.network.model.DetailPriceDto
-import ir.moodz.sarafkoochooloo.data.network.model.Price
+import ir.moodz.sarafkoochooloo.data.network.model.PriceDto
 import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.CurrencyType
 
-fun Price.toCurrency() : Currency {
+fun PriceDto.toCurrency() : Currency {
     return Currency(
-        id = id.toInt(),
         title = currencyTitle,
-        currentPrice = currentPrice,
-        maxPrice = maximumPrice,
-        minPrice = minimumPrice,
-        updatedDate = timestamp
+        currentPrice = currentPrice.dropLast(1).toLong(),
+        updatedDate = timestamp,
+        type = CurrencyType.determineCurrencyType(currencyTitle)
     )
 }
 
 fun Currency.toCurrencyEntity() : CurrencyEntity {
     return CurrencyEntity(
-        id = id,
         title = title,
         currentPrice = currentPrice,
-        maxPrice = maxPrice,
-        minPrice = minPrice,
-        updatedTime = updatedDate
+        updatedTime = updatedDate,
+        type = type
     )
 }
 
 fun CurrencyEntity.toCurrency() : Currency {
     return Currency(
-        id = id,
         title = title,
         currentPrice = currentPrice,
-        maxPrice = maxPrice,
-        minPrice = minPrice,
-        updatedDate = updatedTime
+        updatedDate = updatedTime,
+        type = type
     )
 }
+

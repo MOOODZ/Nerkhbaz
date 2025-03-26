@@ -5,19 +5,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CurrenciesResponseDto(
-    @SerialName("data") val priceData: Data,
-    @SerialName("response") val responseInfo: Response
+    @SerialName("data") val priceDataDto: DataDto,
+    @SerialName("response") val responseDtoInfo: ResponseDto
 )
 
 @Serializable
-data class Data(
-    @SerialName("live_price") val livePrice: List<LivePrice>,
+data class DataDto(
+    @SerialName("live_price") val livePriceDto: List<LivePriceDto>,
     @SerialName("detail_prices") val detailedPrices: List<DetailPriceDto>,
-    @SerialName("prices") val priceList: List<Price>
+    @SerialName("prices") val priceDtoList: List<PriceDto>
 )
 
 @Serializable
-data class LivePrice(
+data class LivePriceDto(
     @SerialName("current") val currentPrice: String
 )
 
@@ -32,7 +32,7 @@ data class DetailPriceDto(
 )
 
 @Serializable
-data class Price(
+data class PriceDto(
     @SerialName("ID") val id: String,
     @SerialName("title") val currencyTitle: String,
     @SerialName("min") val minimumPrice: String,
@@ -42,7 +42,7 @@ data class Price(
 )
 
 @Serializable
-data class Response(
+data class ResponseDto(
     @SerialName("status") val statusCode: Int,
     @SerialName("show_dialog") val shouldShowDialog: Boolean,
     @SerialName("message") val responseMessage: String,

@@ -35,6 +35,6 @@ class KtorRemoteDataSource(
                     )
                 )
             }
-        }.map { it.priceData.priceList.map { it.toCurrency() } }
+        }.map { it.priceDataDto.priceDtoList.map { it.toCurrency() } }
     }
 }

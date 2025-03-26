@@ -1,3 +1,48 @@
 <resources>
     <string name="app_name">Nerkhbaz</string>
+
+    <string name="usd">دلار آمریکا</string>
+    <string name="gel">لاری گرجستان</string>
+    <string name="amd">درام ارمنستان</string>
+    <string name="azn">منات آذربایجان</string>
+    <string name="rub">روبل روسیه</string>
+    <string name="thb">بات تایلند</string>
+    <string name="myr">رینگیت مالزی</string>
+    <string name="hkd">دلار هنگ کنگ</string>
+    <string name="sgd">دلار سنگاپور</string>
+    <string name="pkr">روپیه پاکستان</string>
+    <string name="inr">روپیه هند</string>
+    <string name="syp">لیره سوریه</string>
+    <string name="bhd">دینار بحرین</string>
+    <string name="iqd">دینار عراق</string>
+    <string name="omr">ریال عمان</string>
+    <string name="qar">ریال قطر</string>
+    <string name="sar">ریال عربستان</string>
+    <string name="kwd">دینار کویت</string>
+    <string name="nok">کرون نروژ</string>
+    <string name="dkk">کرون دانمارک</string>
+    <string name="sek">کرون سوئد</string>
+    <string name="afn">ریال افغانستان</string>
+    <string name="nzd">دلار نیوزیلند</string>
+    <string name="aud">دلار استرالیا</string>
+    <string name="gerami">سکه گرمی</string>
+    <string name="cad">دلار کانادا</string>
+    <string name="rob">ربع سکه</string>
+    <string name="jpy">ین ژاپن</string>
+    <string name="nim">نیم سکه</string>
+    <string name="cny">یوان چین</string>
+    <string name="sekee_emami">سکه امامی</string>
+    <string name="try_turkey">لیره ترکیه</string>
+    <string name="seke_bahar">سکه بهار آزادی</string>
+    <string name="aed">درهم امارات</string>
+    <string name="ons">اونس طلا</string>
+    <string name="gbp">پوند انگلیس</string>
+    <string name="gerami_18">طلای ۱۸ عیار</string>
+    <string name="eur">یورو</string>
+    <string name="mesghal">هر مثقال طلا</string>
+    <string name="gerami_24">طلای 24 عیار</string>
+
+    <string name="no_item_found">آیتمی وجود ندارد</string>
+    <string name="toman">%s تومان</string>
+
 </resources>
