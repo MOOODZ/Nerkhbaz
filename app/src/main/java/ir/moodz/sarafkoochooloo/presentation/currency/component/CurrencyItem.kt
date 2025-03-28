@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.presentation.main.component
+package ir.moodz.sarafkoochooloo.presentation.currency.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,15 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.moodz.sarafkoochooloo.R
 import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyType
-import ir.moodz.sarafkoochooloo.presentation.util.convertCurrencyTitleToText
+import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
@@ -38,8 +36,6 @@ fun CurrencyItem(
     modifier: Modifier = Modifier,
     currency: Currency
 ) {
-    val context = LocalContext.current
-
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -80,7 +76,7 @@ fun CurrencyItem(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = convertCurrencyTitleToText(currency.title).asString(context),
+                    text = stringResource(currency.info.stringResId),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -94,10 +90,9 @@ private fun CurrencyItemPreview() {
     NerkhbazTheme {
         CurrencyItem(
             currency = Currency(
-                title = "دلار آمریکا",
-                currentPrice = 200000,
-                updatedDate = "2333333",
-                type = CurrencyType.CURRENCY
+                info = CurrencyInfo.UnitedStatesDollar,
+                currentPrice = 2000000,
+                updatedDate = "1403/02/22",
             )
         )
     }

@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface CurrenciesRepository {
     fun getCurrencies() : Flow<List<Currency>>
-    suspend fun fetchCurrencies() : EmptyResult<DataError>
+    suspend fun fetchCurrencies() : Result<Unit,DataError>
 }

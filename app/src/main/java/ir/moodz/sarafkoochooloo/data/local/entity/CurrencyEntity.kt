@@ -9,7 +9,7 @@ data class CurrencyEntity(
     val id: Int,
     @PrimaryKey(autoGenerate = false)
     val title: String,
-    val currentPrice: Long,
+    val currentPrice: Int,
     val updatedTime: String,
     val type: CurrencyType
 )
