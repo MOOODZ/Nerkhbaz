@@ -1,3 +1,3 @@
-package ir.moodz.core.domain.util
+package ir.moodz.sarafkoochooloo.domain.util
 
 interface Error

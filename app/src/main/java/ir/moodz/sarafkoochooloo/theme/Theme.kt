@@ -17,7 +17,8 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = Color.Black,
     surfaceContainer = LighterGrayColor,
     tertiaryContainer = LightGrayColor,
-    onTertiaryContainer = LightestGrayColor
+    onTertiaryContainer = LightestGrayColor,
+    error = ErrorColor
 )
 
 private val LightColorScheme = lightColorScheme(

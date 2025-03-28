@@ -20,20 +20,22 @@ class OfflineFirstCurrencyRepository(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
     private val applicationScope: CoroutineScope
-): CurrenciesRepository {
+) : CurrenciesRepository {
 
     override fun getCurrencies(): Flow<List<Currency>> {
         return localDataSource.getCurrencies()
     }
 
-    override suspend fun fetchCurrencies(): EmptyResult<DataError>{
-        return when(val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
+    override suspend fun fetchCurrencies(): Result<Unit, DataError> {
+        return when (val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
             is Result.Success -> {
                 applicationScope.async {
-                    localDataSource.upsertCurrencies(result.data).asEmptyDataResult()
+                    localDataSource.upsertCurrencies(result.data)
                 }.await()
+                Result.Success(Unit)
             }
-            is Result.Error -> result.asEmptyDataResult()
+
+            is Result.Error -> Result.Error(result.error)
         }
     }
 }

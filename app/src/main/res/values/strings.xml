@@ -44,5 +44,18 @@
 
     <string name="no_item_found">آیتمی وجود ندارد</string>
     <string name="toman">%s تومان</string>
+    <string name="error_disk_full">ظرفیت حافظه دستگاه تکمیل است</string>
+    <string name="error_request_timeout">تایم اوت سرور</string>
+    <string name="error_too_many_requests">درخواست بیش از حد مجاز از سرور</string>
+    <string name="error_no_internet">اتصال به اینترنت وجود ندارد</string>
+    <string name="error_payload_too_large">حجم در خواست بالا</string>
+    <string name="error_server_error">خطای سرور</string>
+    <string name="error_serialization">خطا در خواندن پیام وب سرویس</string>
+    <string name="error_unknown">خطای ناشناخته</string>
+    <string name="currency_convert">تبدیل نرخ</string>
+    <string name="starting_currency">ارز مبدا</string>
+    <string name="destination_currency">ارز مقصد</string>
+    <string name="select">انتخاب</string>
+    <string name="toman_currency">تومان ایران</string>
 
 </resources>

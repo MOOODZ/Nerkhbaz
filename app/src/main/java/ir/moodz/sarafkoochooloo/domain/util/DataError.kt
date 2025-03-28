@@ -1,7 +1,5 @@
 package ir.moodz.sarafkoochooloo.domain.util
 
-import ir.moodz.core.domain.util.Error
-
 sealed interface DataError: Error {
     enum class Network: DataError{
         REQUEST_TIMEOUT,

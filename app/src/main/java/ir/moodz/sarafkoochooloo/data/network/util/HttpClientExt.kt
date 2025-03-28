@@ -13,9 +13,11 @@ import io.ktor.util.network.UnresolvedAddressException
 import ir.moodz.sarafkoochooloo.BuildConfig
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.SerializationException
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 
 suspend inline fun <reified T> safeCall (execute: () -> HttpResponse): Result<T, DataError.Network>{
     val response = try {
@@ -27,7 +29,7 @@ suspend inline fun <reified T> safeCall (execute: () -> HttpResponse): Result<T,
         Timber.e(e)
         return Result.Error(DataError.Network.SERIALIZATION)
     } catch (e: Exception){
-        if (e is CancellationException) throw e
+        coroutineContext.ensureActive()
         Timber.e(e)
         return Result.Error(DataError.Network.UNKNOWN)
     }
