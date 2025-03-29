@@ -13,7 +13,7 @@ sealed class CurrencyInfo(
         title = "TOMAN",
         stringResId = R.string.toman_currency,
         type = CurrencyType.CURRENCY,
-        id = 1
+        id = 0
     )
     data object UnitedStatesDollar : CurrencyInfo(
         title = "USD",

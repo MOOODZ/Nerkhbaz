@@ -2,19 +2,14 @@ package ir.moodz.sarafkoochooloo.data.repository
 
 import ir.moodz.sarafkoochooloo.domain.local.LocalDataSource
 import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.domain.remote.RemoteDataSource
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.DataError
-import ir.moodz.sarafkoochooloo.domain.util.EmptyResult
 import ir.moodz.sarafkoochooloo.domain.util.Result
-import ir.moodz.sarafkoochooloo.domain.util.asEmptyDataResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
 class OfflineFirstCurrencyRepository(
     private val remoteDataSource: RemoteDataSource,
@@ -30,7 +25,16 @@ class OfflineFirstCurrencyRepository(
         return when (val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
             is Result.Success -> {
                 applicationScope.async {
-                    localDataSource.upsertCurrencies(result.data)
+                    val currencies = result.data.toMutableList()
+                    // We don't have toman on API so we manually adding it here for converting
+                    currencies.add(
+                        Currency(
+                            info = CurrencyInfo.IranToman,
+                            currentPrice = 1,
+                            updatedDate = "1402/02/02"
+                        )
+                    )
+                    localDataSource.upsertCurrencies(currencies)
                 }.await()
                 Result.Success(Unit)
             }

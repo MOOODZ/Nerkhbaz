@@ -6,7 +6,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.moodz.sarafkoochooloo.domain.model.Currency
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.asUiText
 import ir.moodz.sarafkoochooloo.domain.util.onError
@@ -17,6 +16,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -40,6 +40,12 @@ class CurrencyViewModel(
             if (!hasLoadedInitialData) {
                 fetchCurrencies()
                 repository.getCurrencies()
+                    .onEach {  currencies ->
+                        _state.update { it.copy(currenciesWithToman = currencies) }
+                    }
+                    .map { currencies ->
+                        currencies.filterNot { it.info.id == 0 }
+                    }
                     .onEach { currencies ->
                         _state.update { it.copy(currencies = currencies) }
                     }.launchIn(viewModelScope)
@@ -58,31 +64,57 @@ class CurrencyViewModel(
             CurrencyAction.OnPullDownRefresh -> fetchCurrencies()
             CurrencyAction.OnToggleConvertCurrencyModal -> toggleConvertCurrencyModal()
             is CurrencyAction.OnSelectDestinationCurrency -> {
-                _state.update { it.copy(selectedDestinationCurrency = action.currency) }
+                _state.update { it.copy(targetCurrencyId = action.currencyId) }
+                calculateDestinationCurrency()
             }
+
             is CurrencyAction.OnSelectStartingCurrency -> {
-                _state.update { it.copy(selectedStartingCurrency = action.currency) }
+                _state.update { it.copy(startingCurrencyId = action.currencyId) }
+                calculateDestinationCurrency()
             }
+
             CurrencyAction.OnSwapConvertingCurrenciesClick -> swapSelectedCurrencies()
             is CurrencyAction.OnStartingCurrencyAmountChange -> {
                 _state.update { it.copy(startingCurrencyAmount = action.amount) }
-                //calculateDestinationCurrency(startingCurrencyAmount = action.amount)
+                calculateDestinationCurrency(action.amount)
             }
         }
     }
 
-    private fun calculateDestinationCurrency(startingCurrencyAmount: String) {
+    private fun calculateDestinationCurrency(amount: String = state.value.startingCurrencyAmount) {
 
+        if (amount.isBlank()) {
+            _state.update { it.copy(destinationCurrencyAmount = "") }
+            return
+        }
+
+        val startingCurrencyRate = state.value.currenciesWithToman
+            .find { it.info.id == state.value.startingCurrencyId }?.currentPrice?.toLong() ?: return
+
+        val targetCurrencyRate =  state.value.currenciesWithToman
+            .find { it.info.id == state.value.targetCurrencyId }?.currentPrice?.toLong() ?: return
+
+        val destinationCurrencyRate = (startingCurrencyRate * amount.toLong()) / targetCurrencyRate
+
+        if (destinationCurrencyRate > 0) {
+            _state.update {
+                it.copy(destinationCurrencyAmount = destinationCurrencyRate.toString())
+            }
+        }
     }
 
     private fun swapSelectedCurrencies() {
-        _state.update { it.copy(
-            selectedStartingCurrency = state.value.selectedDestinationCurrency,
-            selectedDestinationCurrency = state.value.selectedStartingCurrency
-        ) }
+        _state.update {
+            it.copy(
+                startingCurrencyId = state.value.targetCurrencyId,
+                targetCurrencyId = state.value.startingCurrencyId,
+                destinationCurrencyAmount = state.value.startingCurrencyAmount,
+                startingCurrencyAmount = state.value.destinationCurrencyAmount
+            )
+        }
     }
 
-    private fun toggleConvertCurrencyModal(){
+    private fun toggleConvertCurrencyModal() {
         _state.update {
             it.copy(
                 isConvertCurrencyModalVisible = !state.value.isConvertCurrencyModalVisible

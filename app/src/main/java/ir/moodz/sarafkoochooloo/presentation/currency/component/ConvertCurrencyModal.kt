@@ -28,7 +28,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -52,7 +51,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -66,8 +64,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import ir.moodz.sarafkoochooloo.R
+import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyAction
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyState
+import ir.moodz.sarafkoochooloo.presentation.util.DigitsNumber
 import ir.moodz.sarafkoochooloo.presentation.util.rememberCurrencyVisualTransformation
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
@@ -80,9 +80,11 @@ fun ConvertCurrencyModalBottomSheet(
     onDismiss: () -> Unit
 ) {
 
-    val context = LocalContext.current
-    // We handled the mapping here because we need to retrieve currency names from string resources
-    val currencyNames = remember { state.currencies.map { context.getString(it.info.stringResId) } }
+    val currencyIds = remember {
+        state.currenciesWithToman
+            .map { it.info.id }
+            .sorted()
+    }
 
     var isStartingCurrencyModalVisible by remember { mutableStateOf(false) }
     val startingCurrencyModalSheetState = rememberModalBottomSheetState(
@@ -90,8 +92,8 @@ fun ConvertCurrencyModalBottomSheet(
     )
     if (isStartingCurrencyModalVisible) {
         SelectCurrencyModal(
-            currencies = currencyNames,
-            initialCurrency = state.selectedStartingCurrency ?: currencyNames[0],
+            currencies = currencyIds,
+            initialCurrency = state.startingCurrencyId,
             sheetState = startingCurrencyModalSheetState,
             onCurrencySelect = {
                 onAction(CurrencyAction.OnSelectStartingCurrency(it))
@@ -107,8 +109,8 @@ fun ConvertCurrencyModalBottomSheet(
     )
     if (isDestinationCurrencyModalVisible) {
         SelectCurrencyModal(
-            currencies = currencyNames,
-            initialCurrency = state.selectedDestinationCurrency ?: currencyNames[1],
+            currencies = currencyIds,
+            initialCurrency = state.targetCurrencyId,
             sheetState = destinationCurrencyModalSheetState,
             onCurrencySelect = {
                 onAction(CurrencyAction.OnSelectDestinationCurrency(it))
@@ -161,7 +163,7 @@ fun ConvertCurrencyModalBottomSheet(
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -170,7 +172,7 @@ fun ConvertCurrencyModalBottomSheet(
                     CurrencyBox(
                         title = stringResource(id = R.string.starting_currency),
                         currentAmount = state.startingCurrencyAmount,
-                        selectedCurrency = state.selectedStartingCurrency ?: currencyNames[0],
+                        selectedCurrency = state.startingCurrencyId,
                         onAmountChange = {
                             onAction(CurrencyAction.OnStartingCurrencyAmountChange(it))
                         },
@@ -184,7 +186,7 @@ fun ConvertCurrencyModalBottomSheet(
                             contentColor = MaterialTheme.colorScheme.onBackground
                         ),
                         shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(10.dp),
+                        contentPadding = PaddingValues(12.dp),
                         onClick = {
                             onAction(CurrencyAction.OnSwapConvertingCurrenciesClick)
                         }
@@ -192,14 +194,14 @@ fun ConvertCurrencyModalBottomSheet(
                         Icon(
                             imageVector = Icons.Default.SwapVert,
                             contentDescription = "Swap currencies",
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(35.dp)
                         )
                     }
 
                     CurrencyBox(
                         title = stringResource(id = R.string.destination_currency),
                         currentAmount = state.destinationCurrencyAmount,
-                        selectedCurrency = state.selectedDestinationCurrency ?: currencyNames[1],
+                        selectedCurrency = state.targetCurrencyId,
                         onAmountChange = {},
                         isReadOnly = true,
                         onCurrencyChangeClick = {
@@ -215,13 +217,13 @@ fun ConvertCurrencyModalBottomSheet(
 
 @Composable
 private fun SelectCurrencyModal(
-    currencies: List<String>,
-    initialCurrency: String,
+    currencies: List<Int>,
+    initialCurrency: Int,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    onCurrencySelect: (String) -> Unit,
+    onCurrencySelect: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedCurrency by remember { mutableStateOf(initialCurrency) }
+    var selectedCurrency by remember { mutableIntStateOf(initialCurrency) }
     val itemHeight = 70.dp
     val numberOfDisplayedItems = 3
     val itemHalfHeight = LocalDensity.current.run { itemHeight.toPx() / 2f }
@@ -230,8 +232,7 @@ private fun SelectCurrencyModal(
     var itemsState by remember { mutableStateOf(currencies) }
 
     LaunchedEffect(currencies) {
-        var targetIndex = currencies.indexOf(initialCurrency) - 1
-        targetIndex += ((Int.MAX_VALUE / 2) / currencies.size) * currencies.size
+        var targetIndex = currencies.indexOf(initialCurrency)
         itemsState = currencies
         lastSelectedIndex = targetIndex
         scrollState.scrollToItem(targetIndex)
@@ -265,16 +266,19 @@ private fun SelectCurrencyModal(
                             .height(itemHeight)
                             .onGloballyPositioned { coordinates ->
                                 val y = coordinates.positionInParent().y - itemHalfHeight
-                                val parentHalfHeight = (coordinates.parentCoordinates?.size?.height ?: 0) / 2f
-                                val isSelected = (y > parentHalfHeight - itemHalfHeight && y < parentHalfHeight + itemHalfHeight)
+                                val parentHalfHeight =
+                                    (coordinates.parentCoordinates?.size?.height ?: 0) / 2f
+                                val isSelected =
+                                    (y > parentHalfHeight - itemHalfHeight && y < parentHalfHeight + itemHalfHeight)
                                 if (isSelected && lastSelectedIndex != index) {
                                     selectedCurrency = item
                                     lastSelectedIndex = index
                                 }
-                            }
-                        , content = {
+                            }, content = {
                             Text(
-                                text = currency,
+                                text = stringResource(
+                                    id = CurrencyInfo.fromInt(currency).stringResId
+                                ),
                                 style = if (isSelected) {
                                     MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                                 } else {
@@ -316,89 +320,98 @@ private fun SelectCurrencyModal(
 private fun CurrencyBox(
     modifier: Modifier = Modifier,
     title: String,
-    selectedCurrency: String,
+    selectedCurrency: Int,
     currentAmount: String,
     onAmountChange: (String) -> Unit,
     onCurrencyChangeClick: () -> Unit,
     isReadOnly: Boolean = false
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .fillMaxWidth()
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(16.dp))
+                .fillMaxWidth()
         ) {
-            TextField(
-                modifier = Modifier.weight(2f),
-                value = currentAmount,
-                onValueChange = { amount ->
-                    if (amount.isDigitsOnly() && amount.length <= 11){
-                        onAmountChange(amount)
-                    }
-                },
-                readOnly = isReadOnly,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    textDirection = TextDirection.Ltr,
-                    textAlign = TextAlign.End
-                ),
-                placeholder = {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
-                ),
-                visualTransformation = rememberCurrencyVisualTransformation()
-            )
-            Button(
-                modifier = Modifier.weight(1.2f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ),
-                shape = RoundedCornerShape(
-                    topEnd = 10.dp,
-                    bottomEnd = 10.dp
-                ),
-                contentPadding = PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 16.dp
-                ),
-                onClick = {
-                    onCurrencyChangeClick()
-                }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                TextField(
+                    modifier = Modifier.weight(2f),
+                    value = currentAmount,
+                    onValueChange = { amount ->
+                        if (!amount.startsWith("0") && amount.isDigitsOnly() && amount.length <= 11) {
+                            onAmountChange(amount)
+                        }
+                    },
+                    readOnly = isReadOnly,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        textDirection = TextDirection.Ltr,
+                        textAlign = TextAlign.End
+                    ),
+                    placeholder = {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    ),
+                    visualTransformation = rememberCurrencyVisualTransformation()
+                )
+                Button(
+                    modifier = Modifier.weight(1.2f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    ),
+                    shape = RoundedCornerShape(
+                        topEnd = 10.dp,
+                        bottomEnd = 10.dp
+                    ),
+                    contentPadding = PaddingValues(
+                        horizontal = 12.dp,
+                        vertical = 16.dp
+                    ),
+                    onClick = { onCurrencyChangeClick() }
                 ) {
-                    Text(
-                        text = selectedCurrency,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "$title change"
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                id = CurrencyInfo.fromInt(selectedCurrency).stringResId
+                            ),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "$title change"
+                        )
+                    }
                 }
             }
         }
+        Text(
+            text = DigitsNumber.numberToWords(number = currentAmount),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
-
 }
 
 @Preview
