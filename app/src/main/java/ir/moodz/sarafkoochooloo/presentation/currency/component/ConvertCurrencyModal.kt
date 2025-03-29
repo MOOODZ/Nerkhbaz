@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -408,7 +409,7 @@ private fun CurrencyBox(
         }
         Text(
             text = DigitsNumber.numberToWords(number = currentAmount),
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -421,6 +422,11 @@ private fun ConvertCurrencyModalBottomSheetPreview() {
         ConvertCurrencyModalBottomSheet(
             onDismiss = {},
             state = CurrencyState(),
+            sheetState = SheetState(
+                skipPartiallyExpanded = true,
+                initialValue = SheetValue.Expanded,
+                density = LocalDensity.current
+            ),
             onAction = {}
         )
     }
