@@ -25,16 +25,23 @@ class OfflineFirstCurrencyRepository(
         return when (val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
             is Result.Success -> {
                 applicationScope.async {
+
                     val currencies = result.data.toMutableList()
+
                     // We don't have toman on API so we manually adding it here for converting
                     currencies.add(
                         Currency(
                             info = CurrencyInfo.IranToman,
                             currentPrice = 1,
-                            updatedDate = "1402/02/02"
+                            updatedDate = ""
                         )
                     )
+                    // These currencies removed because of the inaccuracy
+                    currencies.removeIf { it.info.id == CurrencyInfo.OunceGold.id }
+                    currencies.removeIf { it.info.id == CurrencyInfo.SyrianPound.id }
+
                     localDataSource.upsertCurrencies(currencies)
+
                 }.await()
                 Result.Success(Unit)
             }
