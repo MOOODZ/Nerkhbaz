@@ -101,13 +101,13 @@ fun CurrencyScreen(
         }
     }
 
-    val sheetState = rememberModalBottomSheetState(
+    val convertCurrencySheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     if (state.isConvertCurrencyModalVisible){
         ConvertCurrencyModalBottomSheet(
             onDismiss = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
-            sheetState = sheetState,
+            sheetState = convertCurrencySheetState,
             state = state,
             onAction = onAction
         )
@@ -132,70 +132,60 @@ fun CurrencyScreen(
                 isRefreshing = state.isLoading,
                 onRefresh = { onAction(CurrencyAction.OnPullDownRefresh) }
             ) {
-                if (state.currencies.isEmpty() && !state.isLoading) {
-                    Text(
-                        text = stringResource(id = R.string.no_item_found),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                } else {
-                    LazyColumn(
-                        state = state.lazyListState,
-                        contentPadding = PaddingValues(8.dp),
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(
-                            items = state.currencies,
-                            key = { it.info.title }
-                        ) { currency ->
-                            val animatedCurrentPrice by animateIntAsState(
-                                targetValue = currency.currentPrice,
-                                animationSpec = tween(durationMillis = 800)
-                            )
-                            ListItem(
-                                modifier = Modifier.clip(RoundedCornerShape(16.dp)),
-                                shadowElevation = 16.dp,
-                                headlineContent = {
-                                    Text(
-                                        text = stringResource(id = currency.info.stringResId),
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                                    )
-                                },
-                                leadingContent = {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(MaterialTheme.colorScheme.surfaceContainer),
-                                        contentAlignment = Alignment.Center,
-                                        content = {
-                                            Icon(
-                                                imageVector = Icons.Default.Paid,
-                                                contentDescription = null,
-                                                tint = LightestGrayColor,
-                                                modifier = Modifier.padding(
-                                                    vertical = 8.dp,
-                                                    horizontal = 12.dp
-                                                )
+                LazyColumn(
+                    state = state.lazyListState,
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = state.currencies,
+                        key = { it.info.title }
+                    ) { currency ->
+                        val animatedCurrentPrice by animateIntAsState(
+                            targetValue = currency.currentPrice,
+                            animationSpec = tween(durationMillis = 800)
+                        )
+                        ListItem(
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+                            shadowElevation = 16.dp,
+                            headlineContent = {
+                                Text(
+                                    text = stringResource(id = currency.info.stringResId),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                            },
+                            leadingContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                                    contentAlignment = Alignment.Center,
+                                    content = {
+                                        Icon(
+                                            imageVector = Icons.Default.Paid,
+                                            contentDescription = null,
+                                            tint = LightestGrayColor,
+                                            modifier = Modifier.padding(
+                                                vertical = 8.dp,
+                                                horizontal = 12.dp
                                             )
-                                        }
-                                    )
-                                },
-                                trailingContent = {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.toman,
-                                            animatedCurrentPrice.toThousandSeparator()
-                                        ),
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            )
-                        }
+                                        )
+                                    }
+                                )
+                            },
+                            trailingContent = {
+                                Text(
+                                    text = stringResource(
+                                        R.string.toman,
+                                        animatedCurrentPrice.toThousandSeparator()
+                                    ),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -245,7 +235,8 @@ private fun NerkhbazSnackbarError (
     message: String
 ) {
     Snackbar(
-        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(16.dp),
+        shape = RoundedCornerShape(10.dp),
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {

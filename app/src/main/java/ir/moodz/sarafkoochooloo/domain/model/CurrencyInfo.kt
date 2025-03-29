@@ -25,13 +25,13 @@ sealed class CurrencyInfo(
         title = "GEL",
         stringResId = R.string.gel,
         type = CurrencyType.CURRENCY,
-        id = 2
+        id = 38
     )
     data object ArmenianDram : CurrencyInfo(
         title = "AMD",
         stringResId = R.string.amd,
         type = CurrencyType.CURRENCY,
-        id = 3
+        id = 36
     )
     data object AzerbaijaniManat : CurrencyInfo(
         title = "AZN",
@@ -229,7 +229,7 @@ sealed class CurrencyInfo(
         title = "GBP",
         stringResId = R.string.gbp,
         type = CurrencyType.CURRENCY,
-        id = 36
+        id = 3
     )
     data object Gerami18Gold : CurrencyInfo(
         title = "GERAMI_18",
@@ -241,7 +241,7 @@ sealed class CurrencyInfo(
         title = "EUR",
         stringResId = R.string.eur,
         type = CurrencyType.CURRENCY,
-        id = 38
+        id = 2
     )
     data object MesghalGold : CurrencyInfo(
         title = "MESGHAL",

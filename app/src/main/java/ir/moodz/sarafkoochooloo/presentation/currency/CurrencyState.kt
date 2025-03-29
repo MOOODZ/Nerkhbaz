@@ -11,6 +11,7 @@ import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 data class CurrencyState(
     val currencies: List<Currency> = emptyList(),
     val currenciesWithToman: List<Currency> = emptyList(),
+    val currencyIds: List<Int> = emptyList(),
     val isLoading: Boolean = false,
     val pullToRefreshState: PullToRefreshState = PullToRefreshState(),
     val lazyListState: LazyListState = LazyListState(),
@@ -19,5 +20,7 @@ data class CurrencyState(
     val startingCurrencyId: Int = CurrencyInfo.UnitedStatesDollar.id,
     val targetCurrencyId: Int = CurrencyInfo.IranToman.id,
     val startingCurrencyAmount: String = "",
-    val destinationCurrencyAmount: String = ""
+    val destinationCurrencyAmount: String = "",
+    val isStartingCurrencyModalVisible: Boolean = false,
+    val isDestinationCurrencyModalVisible: Boolean = false
 )

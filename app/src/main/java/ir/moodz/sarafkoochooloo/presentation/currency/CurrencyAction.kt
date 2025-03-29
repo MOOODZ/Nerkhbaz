@@ -7,4 +7,6 @@ sealed interface CurrencyAction {
     data class OnSelectDestinationCurrency(val currencyId: Int) : CurrencyAction
     data object OnSwapConvertingCurrenciesClick : CurrencyAction
     data class OnStartingCurrencyAmountChange(val amount: String) : CurrencyAction
+    data object OnToggleStartingCurrencyModal : CurrencyAction
+    data object OnToggleDestinationCurrencyModal : CurrencyAction
 }

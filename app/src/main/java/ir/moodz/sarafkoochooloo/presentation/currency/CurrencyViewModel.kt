@@ -4,8 +4,12 @@ package ir.moodz.sarafkoochooloo.presentation.currency
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.snapshotFlow
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ir.moodz.sarafkoochooloo.domain.util.CurrencyConverter
+import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.asUiText
 import ir.moodz.sarafkoochooloo.domain.util.onError
@@ -40,10 +44,11 @@ class CurrencyViewModel(
             if (!hasLoadedInitialData) {
                 fetchCurrencies()
                 repository.getCurrencies()
-                    .onEach {  currencies ->
-                        _state.update { it.copy(currenciesWithToman = currencies) }
+                    .onEach { currencies ->
+                        setupCurrencyListsBeforeUpdatingMainList(currencies)
                     }
                     .map { currencies ->
+                        // Removing Toman
                         currencies.filterNot { it.info.id == 0 }
                     }
                     .onEach { currencies ->
@@ -51,7 +56,7 @@ class CurrencyViewModel(
                     }.launchIn(viewModelScope)
                 hasLoadedInitialData = true
             }
-            detectScrollingDown()
+            updateScrollingDownBehavior()
         }
         .stateIn(
             scope = viewModelScope,
@@ -61,8 +66,18 @@ class CurrencyViewModel(
 
     fun onAction(action: CurrencyAction) {
         when (action) {
+
             CurrencyAction.OnPullDownRefresh -> fetchCurrencies()
-            CurrencyAction.OnToggleConvertCurrencyModal -> toggleConvertCurrencyModal()
+
+            CurrencyAction.OnToggleConvertCurrencyModal -> {
+                _state.update {
+                    it.copy(
+                        isConvertCurrencyModalVisible = !state.value.isConvertCurrencyModalVisible
+                    )
+                }
+                clearDestinationCurrencyModalState()
+            }
+
             is CurrencyAction.OnSelectDestinationCurrency -> {
                 _state.update { it.copy(targetCurrencyId = action.currencyId) }
                 calculateDestinationCurrency()
@@ -74,16 +89,79 @@ class CurrencyViewModel(
             }
 
             CurrencyAction.OnSwapConvertingCurrenciesClick -> swapSelectedCurrencies()
+
             is CurrencyAction.OnStartingCurrencyAmountChange -> {
-                _state.update { it.copy(startingCurrencyAmount = action.amount) }
-                calculateDestinationCurrency(action.amount)
+                val amount = action.amount
+
+                if(isStartingCurrencyValid(amount)){
+                    _state.update { it.copy(startingCurrencyAmount = amount) }
+                    calculateDestinationCurrency(amount)
+                }
+            }
+
+            CurrencyAction.OnToggleDestinationCurrencyModal -> {
+                _state.update {
+                    it.copy(
+                        isDestinationCurrencyModalVisible =
+                            !state.value.isDestinationCurrencyModalVisible
+                    )
+                }
+            }
+
+            CurrencyAction.OnToggleStartingCurrencyModal -> {
+                _state.update {
+                    it.copy(
+                        isStartingCurrencyModalVisible =
+                            !state.value.isStartingCurrencyModalVisible
+                    )
+                }
             }
         }
     }
 
-    private fun calculateDestinationCurrency(amount: String = state.value.startingCurrencyAmount) {
+    private fun clearDestinationCurrencyModalState() {
+        _state.update {
+            it.copy(
+                startingCurrencyId = CurrencyInfo.UnitedStatesDollar.id,
+                targetCurrencyId = CurrencyInfo.IranToman.id,
+                startingCurrencyAmount = "",
+                destinationCurrencyAmount = ""
+            )
+        }
+    }
 
-        if (amount.isBlank()) {
+    private fun isStartingCurrencyValid(amount: String) : Boolean {
+        if (amount.startsWith("0")){
+            return false
+        }
+        if (!amount.isDigitsOnly()){
+            return false
+        }
+        if (amount.length >= 10){
+            return false
+        }
+        return true
+    }
+
+    private fun setupCurrencyListsBeforeUpdatingMainList(currencies: List<Currency>) {
+        _state.update {
+            it.copy(
+                currenciesWithToman = currencies,
+                // We need sorted currencies with Ids in our convert modal
+                currencyIds = currencies
+                    .sortedWith(
+                        compareByDescending<Currency> { it.info.type }
+                            .thenBy { it.info.id }
+                    ).map { it.info.id }
+            )
+        }
+    }
+
+    private fun calculateDestinationCurrency(
+        startingAmount: String = state.value.startingCurrencyAmount
+    ) {
+
+        if (startingAmount.isBlank()) {
             _state.update { it.copy(destinationCurrencyAmount = "") }
             return
         }
@@ -91,14 +169,19 @@ class CurrencyViewModel(
         val startingCurrencyRate = state.value.currenciesWithToman
             .find { it.info.id == state.value.startingCurrencyId }?.currentPrice?.toLong() ?: return
 
-        val targetCurrencyRate =  state.value.currenciesWithToman
+        val targetCurrencyRate = state.value.currenciesWithToman
             .find { it.info.id == state.value.targetCurrencyId }?.currentPrice?.toLong() ?: return
 
-        val destinationCurrencyRate = (startingCurrencyRate * amount.toLong()) / targetCurrencyRate
+        val calculatedAmount =
+            CurrencyConverter.calculate(
+                amount = startingAmount.toLong(),
+                startingRate = startingCurrencyRate,
+                targetRate = targetCurrencyRate
+            )
 
-        if (destinationCurrencyRate > 0) {
+        calculatedAmount?.let { result ->
             _state.update {
-                it.copy(destinationCurrencyAmount = destinationCurrencyRate.toString())
+                it.copy(destinationCurrencyAmount = result.toString())
             }
         }
     }
@@ -110,14 +193,6 @@ class CurrencyViewModel(
                 targetCurrencyId = state.value.startingCurrencyId,
                 destinationCurrencyAmount = state.value.startingCurrencyAmount,
                 startingCurrencyAmount = state.value.destinationCurrencyAmount
-            )
-        }
-    }
-
-    private fun toggleConvertCurrencyModal() {
-        _state.update {
-            it.copy(
-                isConvertCurrencyModalVisible = !state.value.isConvertCurrencyModalVisible
             )
         }
     }
@@ -140,7 +215,7 @@ class CurrencyViewModel(
         }
     }
 
-    private fun detectScrollingDown() {
+    private fun updateScrollingDownBehavior() {
 
         var previousIndex = 0
         var previousScrollOffset = 0
