@@ -10,6 +10,7 @@ import ir.moodz.sarafkoochooloo.domain.util.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class OfflineFirstCurrencyRepository(
     private val remoteDataSource: RemoteDataSource,
@@ -21,32 +22,47 @@ class OfflineFirstCurrencyRepository(
         return localDataSource.getCurrencies()
     }
 
+    override fun getCurrenciesWithToman(): Flow<List<Currency>> {
+        return localDataSource.getCurrencies().map { currencies ->
+
+            val mutableCurrencies = currencies.toMutableList()
+            // Added Toman as our default currency in order to converting
+            mutableCurrencies.add(
+                Currency(
+                    info = CurrencyInfo.IranToman,
+                    currentPrice = 1,
+                    updatedDate = ""
+                )
+            )
+            // Needed different sorting for converting
+            mutableCurrencies.sortedWith(
+                compareByDescending<Currency> { it.info.type }
+                    .thenBy { it.info.id }
+            )
+        }
+    }
+
     override suspend fun fetchCurrencies(): Result<Unit, DataError> {
         return when (val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
             is Result.Success -> {
+                val currencies = removeInaccurateCurrencies(currencies = result.data)
                 applicationScope.async {
-
-                    val currencies = result.data.toMutableList()
-
-                    // We don't have toman on API so we manually adding it here for converting
-                    currencies.add(
-                        Currency(
-                            info = CurrencyInfo.IranToman,
-                            currentPrice = 1,
-                            updatedDate = ""
-                        )
-                    )
-                    // These currencies removed because of the inaccuracy
-                    currencies.removeIf { it.info.id == CurrencyInfo.OunceGold.id }
-                    currencies.removeIf { it.info.id == CurrencyInfo.SyrianPound.id }
-
                     localDataSource.upsertCurrencies(currencies)
-
                 }.await()
                 Result.Success(Unit)
             }
 
             is Result.Error -> Result.Error(result.error)
         }
+    }
+
+    private fun removeInaccurateCurrencies(currencies: List<Currency>): List<Currency> {
+        val currencies = currencies.toMutableList()
+
+        currencies.removeIf { it.info.id == CurrencyInfo.OunceGold.id }
+        currencies.removeIf { it.info.id == CurrencyInfo.SyrianPound.id }
+        currencies.removeIf { it.info.id == CurrencyInfo.IraqiDinar.id }
+
+        return currencies
     }
 }

@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -23,7 +24,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val keystorePropertiesFile = rootProject.file("local.properties")
+    val keystoreProperties = Properties()
+
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+
     buildTypes {
+        signingConfigs {
+            create("bazaar-release-config") {
+                storeFile = file(keystoreProperties["BAZAAR-KEYSTORE_FILE"] as String)
+                storePassword = keystoreProperties["BAZAAR-KEYSTORE_PASSWORD"] as String
+                keyAlias = keystoreProperties["BAZAAR-KEY_ALIAS"] as String
+                keyPassword = keystoreProperties["BAZAAR-KEY_PASSWORD"] as String
+            }
+        }
         debug {
             val baseUrl = gradleLocalProperties(rootDir , providers).getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
@@ -37,6 +51,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("bazaar-release-config")
         }
     }
     compileOptions {

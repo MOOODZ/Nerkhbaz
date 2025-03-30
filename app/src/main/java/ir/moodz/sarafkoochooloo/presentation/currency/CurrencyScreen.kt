@@ -144,7 +144,7 @@ fun CurrencyScreen(
                     ) { currency ->
                         val animatedCurrentPrice by animateIntAsState(
                             targetValue = currency.currentPrice,
-                            animationSpec = tween(durationMillis = 800)
+                            animationSpec = tween(durationMillis = 1000)
                         )
                         ListItem(
                             modifier = Modifier.clip(RoundedCornerShape(16.dp)),

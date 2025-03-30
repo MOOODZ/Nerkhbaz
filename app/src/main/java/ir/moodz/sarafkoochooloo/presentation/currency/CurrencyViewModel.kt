@@ -41,22 +41,14 @@ class CurrencyViewModel(
     private val _state = MutableStateFlow(CurrencyState())
     val state = _state
         .onStart {
+            // Update need on every single onStart lifecycle
+            fetchCurrencies()
             if (!hasLoadedInitialData) {
-                fetchCurrencies()
-                repository.getCurrencies()
-                    .onEach { currencies ->
-                        setupCurrencyListsBeforeUpdatingMainList(currencies)
-                    }
-                    .map { currencies ->
-                        // Removing Toman
-                        currencies.filterNot { it.info.id == 0 }
-                    }
-                    .onEach { currencies ->
-                        _state.update { it.copy(currencies = currencies) }
-                    }.launchIn(viewModelScope)
+                getMainCurrencies()
+                getCurrenciesWithToman()
+                updateScrollingDownBehavior()
                 hasLoadedInitialData = true
             }
-            updateScrollingDownBehavior()
         }
         .stateIn(
             scope = viewModelScope,
@@ -93,7 +85,7 @@ class CurrencyViewModel(
             is CurrencyAction.OnStartingCurrencyAmountChange -> {
                 val amount = action.amount
 
-                if(isStartingCurrencyValid(amount)){
+                if (isStartingCurrencyValid(amount)) {
                     _state.update { it.copy(startingCurrencyAmount = amount) }
                     calculateDestinationCurrency(amount)
                 }
@@ -119,6 +111,26 @@ class CurrencyViewModel(
         }
     }
 
+    private fun getMainCurrencies() {
+        repository.getCurrencies()
+            .onEach { currencies ->
+                _state.update { it.copy(currencies = currencies) }
+            }.launchIn(viewModelScope)
+    }
+
+    private fun getCurrenciesWithToman() {
+        repository.getCurrenciesWithToman()
+            .onEach { currenciesWithToman ->
+                _state.update {
+                    it.copy(
+                        currenciesWithToman = currenciesWithToman,
+                        currencyIds = currenciesWithToman.map { it.info.id }
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     private fun clearDestinationCurrencyModalState() {
         _state.update {
             it.copy(
@@ -130,14 +142,14 @@ class CurrencyViewModel(
         }
     }
 
-    private fun isStartingCurrencyValid(amount: String) : Boolean {
-        if (amount.startsWith("0")){
+    private fun isStartingCurrencyValid(amount: String): Boolean {
+        if (amount.startsWith("0")) {
             return false
         }
-        if (!amount.isDigitsOnly()){
+        if (!amount.isDigitsOnly()) {
             return false
         }
-        if (amount.length >= 10){
+        if (amount.length >= 10) {
             return false
         }
         return true

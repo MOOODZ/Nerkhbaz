@@ -15,7 +15,7 @@ import timber.log.Timber
 
 class NerkhbazApp : Application() {
 
-    val applicationScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    val applicationScope = CoroutineScope(SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
