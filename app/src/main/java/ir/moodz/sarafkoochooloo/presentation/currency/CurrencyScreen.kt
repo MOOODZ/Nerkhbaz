@@ -205,7 +205,7 @@ fun CurrencyScreen(
                         .padding(horizontal = 16.dp),
                     contentPadding = PaddingValues(vertical = 16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.background,
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
