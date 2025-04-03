@@ -66,7 +66,7 @@ fun CurrencyChartModal(
     currencies: List<Currency> = emptyList(),
     selectedCurrency: CurrencyInfo?,
     isLoading: Boolean = false,
-    graphColor: Color = MaterialTheme.colorScheme.primary
+    graphColor: Color = Color.Green
 ) {
     val spacing = LocalConfiguration.current.screenHeightDp * 0.15f
     val transparentGraphColor = remember {
@@ -84,6 +84,8 @@ fun CurrencyChartModal(
         /* style = */ Typeface.BOLD
     )
     val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
+
+    // TODO : Handle texts with composables with draw text instead of Android TextPaint
     val textPaint = remember(density) {
         Paint().apply {
             color = textColor
