@@ -346,7 +346,7 @@ sealed class CurrencyInfo(
                 Euro.id -> Euro
                 MesghalGold.id -> MesghalGold
                 Gerami24Gold.id -> Gerami24Gold
-                else -> UnitedStatesDollar // Fallback to a default value
+                else -> UnitedStatesDollar
             }
         }
     }

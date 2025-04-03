@@ -7,10 +7,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.moodz.sarafkoochooloo.domain.util.CurrencyConverter
 import ir.moodz.sarafkoochooloo.domain.model.Currency
 import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
+import ir.moodz.sarafkoochooloo.domain.util.CurrencyConverter
 import ir.moodz.sarafkoochooloo.domain.util.asUiText
 import ir.moodz.sarafkoochooloo.domain.util.onError
 import ir.moodz.sarafkoochooloo.domain.util.onSuccess
@@ -20,13 +20,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class CurrencyViewModel(
     private val repository: CurrenciesRepository,
@@ -108,6 +108,16 @@ class CurrencyViewModel(
                     )
                 }
             }
+
+            is CurrencyAction.OnCurrencyChartClick -> getCurrenciesByDays(action.currencyTitle)
+
+            CurrencyAction.OnToggleChartModalDismiss -> {
+                _state.update { it.copy(
+                    isChartModalVisible = false,
+                    selectedCurrencyDays = emptyList(),
+                    selectedDetailCurrency = null
+                ) }
+            }
         }
     }
 
@@ -129,6 +139,37 @@ class CurrencyViewModel(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun getCurrenciesByDays(currencyTitle: String) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isChartLoading = true,
+                    isChartModalVisible = true,
+                    selectedDetailCurrency = CurrencyInfo.fromTitle(currencyTitle)
+                )
+            }
+            repository.getCurrenciesByDays(currencyTitle)
+                .onSuccess { result ->
+                    _state.update {
+                        it.copy(
+                            isChartLoading = false,
+                            selectedCurrencyDays = result
+                        )
+                    }
+                    Timber.tag("CHART_DATA").d(result.toString())
+                }
+                .onError { error ->
+                    _state.update {
+                        it.copy(
+                            isChartLoading = false,
+                            isChartModalVisible = false
+                        )
+                    }
+                    _events.send(CurrencyEvent.Error(message = error.asUiText()))
+                }
+        }
     }
 
     private fun clearDestinationCurrencyModalState() {

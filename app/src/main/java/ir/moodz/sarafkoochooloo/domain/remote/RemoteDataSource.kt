@@ -5,5 +5,6 @@ import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
 
 interface RemoteDataSource {
-    suspend fun getPrices(selectedCurrency: String) : Result<List<Currency>, DataError.Network>
+    suspend fun getCurrencies(selectedCurrency: String) : Result<List<Currency>, DataError.Network>
+    suspend fun getCurrencyInfoByDays(currencyTitle: String) : Result<List<Currency> , DataError.Network>
 }

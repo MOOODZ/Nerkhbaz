@@ -57,5 +57,6 @@
     <string name="destination_currency">ارز مقصد</string>
     <string name="select">انتخاب</string>
     <string name="toman_currency">تومان ایران</string>
+    <string name="back">بازگشت</string>
 
 </resources>

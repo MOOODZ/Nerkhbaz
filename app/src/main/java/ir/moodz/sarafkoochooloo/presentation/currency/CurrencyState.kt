@@ -22,5 +22,9 @@ data class CurrencyState(
     val startingCurrencyAmount: String = "",
     val destinationCurrencyAmount: String = "",
     val isStartingCurrencyModalVisible: Boolean = false,
-    val isDestinationCurrencyModalVisible: Boolean = false
+    val isDestinationCurrencyModalVisible: Boolean = false,
+    val selectedCurrencyDays: List<Currency> = emptyList(),
+    val isChartLoading: Boolean = false,
+    val isChartModalVisible: Boolean = false,
+    val selectedDetailCurrency: CurrencyInfo? = null
 )

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,6 +55,7 @@ import ir.moodz.sarafkoochooloo.R
 import ir.moodz.sarafkoochooloo.domain.model.Currency
 import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertCurrencyModalBottomSheet
+import ir.moodz.sarafkoochooloo.presentation.currency.component.CurrencyChartModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.LightestGrayColor
@@ -113,6 +114,19 @@ fun CurrencyScreen(
         )
     }
 
+    val currencyChartSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    if (state.isChartModalVisible){
+        CurrencyChartModal(
+            sheetState = currencyChartSheetState,
+            onDismiss = { onAction(CurrencyAction.OnToggleChartModalDismiss) },
+            currencies = state.selectedCurrencyDays,
+            selectedCurrency = state.selectedDetailCurrency,
+            isLoading = state.isLoading
+        )
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -147,7 +161,11 @@ fun CurrencyScreen(
                             animationSpec = tween(durationMillis = 1000)
                         )
                         ListItem(
-                            modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable{
+                                    onAction(CurrencyAction.OnCurrencyChartClick(currency.info.title))
+                                },
                             shadowElevation = 16.dp,
                             headlineContent = {
                                 Text(
@@ -270,7 +288,7 @@ private fun Preview() {
                     Currency(
                         info = CurrencyInfo.UnitedStatesDollar,
                         currentPrice = 2000000,
-                        updatedDate = "1403/02/22",
+                        updatedDate = 12 to 12,
                     )
                 )
             ),

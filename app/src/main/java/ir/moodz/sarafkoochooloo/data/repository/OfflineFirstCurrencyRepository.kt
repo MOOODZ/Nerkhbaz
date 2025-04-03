@@ -31,7 +31,7 @@ class OfflineFirstCurrencyRepository(
                 Currency(
                     info = CurrencyInfo.IranToman,
                     currentPrice = 1,
-                    updatedDate = ""
+                    updatedDate = 12 to 12
                 )
             )
             // Needed different sorting for converting
@@ -43,7 +43,7 @@ class OfflineFirstCurrencyRepository(
     }
 
     override suspend fun fetchCurrencies(): Result<Unit, DataError> {
-        return when (val result = remoteDataSource.getPrices(selectedCurrency = "USD")) {
+        return when (val result = remoteDataSource.getCurrencies(selectedCurrency = "USD")) {
             is Result.Success -> {
                 val currencies = removeInaccurateCurrencies(currencies = result.data)
                 applicationScope.async {
@@ -54,6 +54,12 @@ class OfflineFirstCurrencyRepository(
 
             is Result.Error -> Result.Error(result.error)
         }
+    }
+
+    override suspend fun getCurrenciesByDays(
+        currencyTitle: String
+    ): Result<List<Currency>, DataError> {
+        return remoteDataSource.getCurrencyInfoByDays(currencyTitle)
     }
 
     private fun removeInaccurateCurrencies(currencies: List<Currency>): List<Currency> {

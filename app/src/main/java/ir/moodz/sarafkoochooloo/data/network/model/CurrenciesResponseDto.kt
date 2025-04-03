@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CurrenciesResponseDto(
-    @SerialName("data") val priceDataDto: DataDto,
-    @SerialName("response") val responseDtoInfo: ResponseDto
+    @SerialName("data") val currenciesDataDto: CurrenciesDataDto,
+    @SerialName("response") val responseDtoInfo: ApiResponseDetailDto
 )
 
 @Serializable
-data class DataDto(
+data class CurrenciesDataDto(
     @SerialName("live_price") val livePriceDto: List<LivePriceDto>,
     @SerialName("detail_prices") val detailedPrices: List<DetailPriceDto>,
     @SerialName("prices") val priceDtoList: List<PriceDto>
@@ -38,16 +38,5 @@ data class PriceDto(
     @SerialName("min") val minimumPrice: String,
     @SerialName("max") val maximumPrice: String,
     @SerialName("current") val currentPrice: String,
-    @SerialName("time") val timestamp: String
-)
-
-@Serializable
-data class ResponseDto(
-    @SerialName("status") val statusCode: Int,
-    @SerialName("show_dialog") val shouldShowDialog: Boolean,
-    @SerialName("message") val responseMessage: String,
-    @SerialName("positive_btn") val positiveButtonText: String,
-    @SerialName("negative_btn") val negativeButtonText: String,
-    @SerialName("positive_url") val positiveButtonUrl: String,
-    @SerialName("can_dismiss") val isDismissible: Boolean
+    @SerialName("time") val updatedDate: String
 )

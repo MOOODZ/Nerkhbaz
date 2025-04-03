@@ -35,6 +35,14 @@ fun Double.toThousandSeparator(): String {
         .reversed()
 }
 
+fun Float.toThousandSeparator(): String {
+    return this.toLong().toString()
+        .reversed()
+        .chunked(3)
+        .joinToString(",")
+        .reversed()
+}
+
 
 
 
