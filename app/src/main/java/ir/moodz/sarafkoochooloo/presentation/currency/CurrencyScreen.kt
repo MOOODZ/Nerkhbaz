@@ -54,8 +54,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.moodz.sarafkoochooloo.R
 import ir.moodz.sarafkoochooloo.domain.model.Currency
 import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
-import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertCurrencyModalBottomSheet
-import ir.moodz.sarafkoochooloo.presentation.currency.component.CurrencyChartModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.ChartModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.LightestGrayColor
@@ -106,7 +106,7 @@ fun CurrencyScreen(
         skipPartiallyExpanded = true
     )
     if (state.isConvertCurrencyModalVisible){
-        ConvertCurrencyModalBottomSheet(
+        ConvertModal(
             onDismiss = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
             sheetState = convertCurrencySheetState,
             state = state,
@@ -118,7 +118,7 @@ fun CurrencyScreen(
         skipPartiallyExpanded = true
     )
     if (state.isChartModalVisible){
-        CurrencyChartModal(
+        ChartModal(
             sheetState = currencyChartSheetState,
             onDismiss = { onAction(CurrencyAction.OnToggleChartModalDismiss) },
             currencies = state.selectedCurrencyDays,

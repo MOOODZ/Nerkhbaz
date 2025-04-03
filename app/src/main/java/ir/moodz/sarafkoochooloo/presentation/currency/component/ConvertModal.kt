@@ -2,6 +2,7 @@
 
 package ir.moodz.sarafkoochooloo.presentation.currency.component
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -72,11 +73,12 @@ import ir.moodz.sarafkoochooloo.R
 import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyAction
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyState
+import ir.moodz.sarafkoochooloo.presentation.util.DigitsNumber
 import ir.moodz.sarafkoochooloo.presentation.util.rememberCurrencyVisualTransformation
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
 @Composable
-fun ConvertCurrencyModalBottomSheet(
+fun ConvertModal(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     state: CurrencyState,
@@ -209,7 +211,7 @@ fun ConvertCurrencyModalBottomSheet(
                             contentDescription = "Swap currencies",
                             modifier = Modifier
                                 .size(35.dp)
-                                .graphicsLayer{
+                                .graphicsLayer {
                                     rotationZ = rotationAngle
                                 }
                         )
@@ -226,6 +228,14 @@ fun ConvertCurrencyModalBottomSheet(
                         onCurrencyChangeClick = {
                             onAction(CurrencyAction.OnToggleDestinationCurrencyModal)
                         }
+                    )
+
+                    Spacer(Modifier.height(4.dp))
+
+                    Text(
+                        text = DigitsNumber.numberToWords(state.destinationCurrencyAmount),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -400,6 +410,7 @@ private fun CurrencyBox(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done
                         ),
+                        maxLines = 1,
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.End
@@ -425,22 +436,19 @@ private fun CurrencyBox(
                     )
                 }
             }
-//        Text(
-//            text = DigitsNumber.numberToWords(number = currentAmount),
-//            style = MaterialTheme.typography.labelSmall,
-//            modifier = Modifier.fillMaxWidth()
-//        )
         }
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun ConvertCurrencyModalBottomSheetPreview() {
+private fun ConvertModalPreview() {
     NerkhbazTheme {
-        ConvertCurrencyModalBottomSheet(
+        ConvertModal(
             onDismiss = {},
-            state = CurrencyState(),
+            state = CurrencyState(
+                destinationCurrencyAmount = "45000"
+            ),
             sheetState = SheetState(
                 skipPartiallyExpanded = true,
                 initialValue = SheetValue.Expanded,

@@ -190,7 +190,7 @@ class CurrencyViewModel(
         if (!amount.isDigitsOnly()) {
             return false
         }
-        if (amount.length >= 10) {
+        if (amount.length >= 12) {
             return false
         }
         return true

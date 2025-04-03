@@ -59,7 +59,7 @@ import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
 @Composable
-fun CurrencyChartModal(
+fun ChartModal(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     onDismiss: () -> Unit = {},
@@ -253,20 +253,12 @@ fun CurrencyChartModal(
     }
 }
 
-//@Preview(
-//    name = "Smaller Screens",
-//    showBackground = true,
-//    showSystemUi = true,
-//    uiMode = Configuration.UI_MODE_NIGHT_YES,
-//    widthDp = 360,
-//    heightDp = 640
-//)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun CurrencyChartPreview() {
+private fun ChartPreview() {
     NerkhbazTheme {
 
-        CurrencyChartModal(
+        ChartModal(
             sheetState = SheetState(
                 skipPartiallyExpanded = true,
                 initialValue = SheetValue.Expanded,
