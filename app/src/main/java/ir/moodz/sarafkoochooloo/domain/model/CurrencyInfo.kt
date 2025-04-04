@@ -1,11 +1,13 @@
 package ir.moodz.sarafkoochooloo.domain.model
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import ir.moodz.sarafkoochooloo.R
 
 sealed class CurrencyInfo(
     val title: String,
     @StringRes val stringResId: Int,
+    @DrawableRes val iconResId: Int? = null,
     val type: CurrencyType,
     val id: Int
 ) {
@@ -13,13 +15,14 @@ sealed class CurrencyInfo(
         title = "TOMAN",
         stringResId = R.string.toman_currency,
         type = CurrencyType.CURRENCY,
-        id = 0
+        id = 0,
     )
     data object UnitedStatesDollar : CurrencyInfo(
         title = "USD",
         stringResId = R.string.usd,
         type = CurrencyType.CURRENCY,
-        id = 1
+        id = 1,
+        iconResId = R.drawable.ic_usa
     )
     data object GeorgianLari : CurrencyInfo(
         title = "GEL",
@@ -163,7 +166,8 @@ sealed class CurrencyInfo(
         title = "GERAMI",
         stringResId = R.string.gerami,
         type = CurrencyType.COMMODITY,
-        id = 25
+        id = 25,
+        iconResId = R.drawable.ic_coin
     )
     data object CanadianDollar : CurrencyInfo(
         title = "CAD",
@@ -175,7 +179,8 @@ sealed class CurrencyInfo(
         title = "ROB",
         stringResId = R.string.rob,
         type = CurrencyType.COMMODITY,
-        id = 27
+        id = 27,
+        iconResId = R.drawable.ic_coin
     )
     data object JapaneseYen : CurrencyInfo(
         title = "JPY",
@@ -187,7 +192,8 @@ sealed class CurrencyInfo(
         title = "NIM",
         stringResId = R.string.nim,
         type = CurrencyType.COMMODITY,
-        id = 29
+        id = 29,
+        iconResId = R.drawable.ic_coin
     )
     data object ChineseYuan : CurrencyInfo(
         title = "CNY",
@@ -199,7 +205,8 @@ sealed class CurrencyInfo(
         title = "SEKEE_EMAMI",
         stringResId = R.string.sekee_emami,
         type = CurrencyType.COMMODITY,
-        id = 31
+        id = 31,
+        iconResId = R.drawable.ic_coin
     )
     data object TurkishLira : CurrencyInfo(
         title = "TRY",
@@ -211,7 +218,8 @@ sealed class CurrencyInfo(
         title = "SEKE_BAHAR",
         stringResId = R.string.seke_bahar,
         type = CurrencyType.COMMODITY,
-        id = 33
+        id = 33,
+        iconResId = R.drawable.ic_coin
     )
     data object UnitedArabEmiratesDirham : CurrencyInfo(
         title = "AED",
@@ -223,37 +231,43 @@ sealed class CurrencyInfo(
         title = "ONS",
         stringResId = R.string.ons,
         type = CurrencyType.COMMODITY,
-        id = 35
+        id = 35,
+        iconResId = R.drawable.ic_gold
     )
     data object BritishPound : CurrencyInfo(
         title = "GBP",
         stringResId = R.string.gbp,
         type = CurrencyType.CURRENCY,
-        id = 3
+        id = 3,
+        iconResId = R.drawable.ic_england
     )
     data object Gerami18Gold : CurrencyInfo(
         title = "GERAMI_18",
         stringResId = R.string.gerami_18,
         type = CurrencyType.COMMODITY,
-        id = 37
+        id = 37,
+        iconResId = R.drawable.ic_gold
     )
     data object Euro : CurrencyInfo(
         title = "EUR",
         stringResId = R.string.eur,
         type = CurrencyType.CURRENCY,
-        id = 2
+        id = 2,
+        iconResId = R.drawable.ic_eu
     )
     data object MesghalGold : CurrencyInfo(
         title = "MESGHAL",
         stringResId = R.string.mesghal,
         type = CurrencyType.COMMODITY,
-        id =39
+        id =39,
+        iconResId = R.drawable.ic_gold
     )
     data object Gerami24Gold : CurrencyInfo(
         title = "GERAMI_24",
         stringResId = R.string.gerami_24,
         type = CurrencyType.COMMODITY,
-        id = 40
+        id = 40,
+        iconResId = R.drawable.ic_gold
     )
 
     companion object {

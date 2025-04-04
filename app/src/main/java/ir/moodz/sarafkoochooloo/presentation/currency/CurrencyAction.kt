@@ -1,5 +1,7 @@
 package ir.moodz.sarafkoochooloo.presentation.currency
 
+import ir.moodz.sarafkoochooloo.domain.model.Currency
+
 sealed interface CurrencyAction {
     data object OnPullDownRefresh : CurrencyAction
     data object OnToggleConvertCurrencyModal : CurrencyAction
@@ -9,6 +11,6 @@ sealed interface CurrencyAction {
     data class OnStartingCurrencyAmountChange(val amount: String) : CurrencyAction
     data object OnToggleStartingCurrencyModal : CurrencyAction
     data object OnToggleDestinationCurrencyModal : CurrencyAction
-    data class OnCurrencyChartClick(val currencyTitle: String) : CurrencyAction
+    data class OnCurrencyChartClick(val currency: Currency) : CurrencyAction
     data object OnToggleChartModalDismiss : CurrencyAction
 }

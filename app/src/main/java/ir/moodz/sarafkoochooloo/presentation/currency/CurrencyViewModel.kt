@@ -16,6 +16,7 @@ import ir.moodz.sarafkoochooloo.domain.util.onError
 import ir.moodz.sarafkoochooloo.domain.util.onSuccess
 import ir.moodz.sarafkoochooloo.navigation.Destination
 import ir.moodz.sarafkoochooloo.navigation.Navigator
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,13 +37,17 @@ class CurrencyViewModel(
     private val _events = Channel<CurrencyEvent>()
     val events = _events.receiveAsFlow()
 
+    private var chartScope: Job? = null
+    private var lastFetchTryTimeStamp: Long = System.currentTimeMillis()
+
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(CurrencyState())
     val state = _state
         .onStart {
-            // Update need on every single onStart lifecycle
-            fetchCurrencies()
+            if (isFiveMinutesPassed()){
+                fetchCurrencies()
+            }
             if (!hasLoadedInitialData) {
                 getMainCurrencies()
                 getCurrenciesWithToman()
@@ -109,15 +114,27 @@ class CurrencyViewModel(
                 }
             }
 
-            is CurrencyAction.OnCurrencyChartClick -> getCurrenciesByDays(action.currencyTitle)
+            is CurrencyAction.OnCurrencyChartClick -> getCurrenciesByDays(action.currency)
 
             CurrencyAction.OnToggleChartModalDismiss -> {
-                _state.update { it.copy(
-                    isChartModalVisible = false,
-                    selectedCurrencyDays = emptyList(),
-                    selectedDetailCurrency = null
-                ) }
+                chartScope?.cancel()
+                _state.update {
+                    it.copy(
+                        isChartModalVisible = false,
+                        selectedCurrencyDays = emptyList(),
+                        selectedDetailCurrency = null
+                    )
+                }
             }
+        }
+    }
+
+    private fun isFiveMinutesPassed(): Boolean {
+        return if (System.currentTimeMillis() - lastFetchTryTimeStamp >= 5 * 60 * 1000) {
+            lastFetchTryTimeStamp = System.currentTimeMillis()
+            true
+        } else {
+            false
         }
     }
 
@@ -141,16 +158,17 @@ class CurrencyViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun getCurrenciesByDays(currencyTitle: String) {
-        viewModelScope.launch {
+    private fun getCurrenciesByDays(currency: Currency) {
+        chartScope?.cancel()
+        chartScope = viewModelScope.launch {
             _state.update {
                 it.copy(
                     isChartLoading = true,
                     isChartModalVisible = true,
-                    selectedDetailCurrency = CurrencyInfo.fromTitle(currencyTitle)
+                    selectedDetailCurrency = currency
                 )
             }
-            repository.getCurrenciesByDays(currencyTitle)
+            repository.getCurrenciesByDays(currency.info.title)
                 .onSuccess { result ->
                     _state.update {
                         it.copy(

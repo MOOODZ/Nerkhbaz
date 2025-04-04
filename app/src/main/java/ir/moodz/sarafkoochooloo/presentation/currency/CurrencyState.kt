@@ -26,5 +26,5 @@ data class CurrencyState(
     val selectedCurrencyDays: List<Currency> = emptyList(),
     val isChartLoading: Boolean = false,
     val isChartModalVisible: Boolean = false,
-    val selectedDetailCurrency: CurrencyInfo? = null
+    val selectedDetailCurrency: Currency? = null
 )

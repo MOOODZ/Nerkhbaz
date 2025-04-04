@@ -15,11 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -28,6 +32,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,10 +48,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
@@ -64,7 +71,7 @@ fun ChartModal(
     sheetState: SheetState = rememberModalBottomSheetState(),
     onDismiss: () -> Unit = {},
     currencies: List<Currency> = emptyList(),
-    selectedCurrency: CurrencyInfo?,
+    selectedCurrency: Currency?,
     isLoading: Boolean = false,
     graphColor: Color = Color.Green
 ) {
@@ -102,16 +109,41 @@ fun ChartModal(
     ) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        if (selectedCurrency != null) {
-                            Text(
-                                text = stringResource(selectedCurrency.stringResId),
-                                style = MaterialTheme.typography.titleLarge
-                            )
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            if (selectedCurrency != null) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(selectedCurrency.info.stringResId),
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                    Text(
+                                        text = stringResource(
+                                            R.string.last_price,
+                                            selectedCurrency.currentPrice.toThousandSeparator()
+                                        ),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                            }
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = { onDismiss() },
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close"
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                }
             },
             content = { innerPadding ->
                 Column(
@@ -129,7 +161,7 @@ fun ChartModal(
                         Canvas(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .fillMaxHeight(fraction = 0.6f)
+                                .fillMaxHeight(fraction = 0.7f)
                                 .padding(horizontal = 16.dp)
                         ) {
                             // Draw date labels on x-axis
@@ -228,27 +260,27 @@ fun ChartModal(
                         }
                     }
                 }
-            },
-            bottomBar = {
-                Button(
-                    onClick = { onDismiss() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.background
-                    ),
-                    contentPadding = PaddingValues(16.dp),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.back),
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        textAlign = TextAlign.Center
-                    )
-                }
             }
+//            bottomBar = {
+//                Button(
+//                    onClick = { onDismiss() },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(16.dp),
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = MaterialTheme.colorScheme.primary,
+//                        contentColor = MaterialTheme.colorScheme.background
+//                    ),
+//                    contentPadding = PaddingValues(16.dp),
+//                    shape = RoundedCornerShape(10.dp)
+//                ) {
+//                    Text(
+//                        text = stringResource(id = R.string.back),
+//                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+//                        textAlign = TextAlign.Center
+//                    )
+//                }
+//            }
         )
     }
 }
@@ -264,7 +296,11 @@ private fun ChartPreview() {
                 initialValue = SheetValue.Expanded,
                 density = LocalDensity.current
             ),
-            selectedCurrency = CurrencyInfo.UnitedStatesDollar,
+            selectedCurrency = Currency(
+                info = CurrencyInfo.UnitedStatesDollar,
+                currentPrice = 1000000000,
+                updatedDate = Pair(1, 1)
+            ),
             currencies = MockData.chart
         )
     }

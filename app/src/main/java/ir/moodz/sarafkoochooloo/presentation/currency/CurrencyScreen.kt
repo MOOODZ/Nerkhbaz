@@ -29,6 +29,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,6 +61,7 @@ import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ChartModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
+import ir.moodz.sarafkoochooloo.theme.Gray_300
 import ir.moodz.sarafkoochooloo.theme.LightestGrayColor
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 import kotlinx.coroutines.flow.Flow
@@ -162,45 +166,63 @@ fun CurrencyScreen(
                         )
                         ListItem(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable{
-                                    onAction(CurrencyAction.OnCurrencyChartClick(currency.info.title))
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    onAction(CurrencyAction.OnCurrencyChartClick(currency))
                                 },
-                            shadowElevation = 16.dp,
+                            shadowElevation = 12.dp,
                             headlineContent = {
-                                Text(
-                                    text = stringResource(id = currency.info.stringResId),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onTertiaryContainer
-                                )
-                            },
-                            leadingContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceContainer),
-                                    contentAlignment = Alignment.Center,
-                                    content = {
-                                        Icon(
-                                            imageVector = Icons.Default.Paid,
-                                            contentDescription = null,
-                                            tint = LightestGrayColor,
-                                            modifier = Modifier.padding(
-                                                vertical = 8.dp,
-                                                horizontal = 12.dp
-                                            )
-                                        )
-                                    }
-                                )
-                            },
-                            trailingContent = {
                                 Text(
                                     text = stringResource(
                                         R.string.toman,
                                         animatedCurrentPrice.toThousandSeparator()
                                     ),
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                            },
+                            leadingContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    ,
+                                    contentAlignment = Alignment.Center,
+                                    content = {
+                                        if (currency.info.iconResId != null){
+                                            Icon(
+                                                painter = painterResource(id = currency.info.iconResId),
+                                                contentDescription = null,
+                                                tint = LightestGrayColor,
+                                                modifier = Modifier
+                                                    .padding(
+                                                        vertical = 8.dp,
+                                                        horizontal = 12.dp
+                                                    )
+                                                    .size(25.dp)
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = Icons.Default.Paid,
+                                                contentDescription = null,
+                                                tint = LightestGrayColor,
+                                                modifier = Modifier
+                                                    .padding(
+                                                        vertical = 8.dp,
+                                                        horizontal = 12.dp
+                                                    )
+                                                    .size(25.dp)
+                                            )
+                                        }
+                                    }
+                                )
+                            },
+                            trailingContent = {
+                                Text(
+                                    text = stringResource(id = currency.info.stringResId),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Gray_300
                                 )
                             }
                         )
@@ -208,39 +230,53 @@ fun CurrencyScreen(
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = FabPosition.EndOverlay,
         floatingActionButton = {
             AnimatedVisibility(
                 visible = !state.isScrollingDown && state.currencies.isNotEmpty(),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                Button (
+//                Button (
+//                    onClick = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
+//                    shape = RoundedCornerShape(16.dp),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp),
+//                    contentPadding = PaddingValues(vertical = 16.dp),
+//                    colors = ButtonDefaults.buttonColors(
+//                        contentColor = MaterialTheme.colorScheme.background,
+//                        containerColor = MaterialTheme.colorScheme.primary
+//                    )
+//                ) {
+//                    Row(
+//                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Text(
+//                            text = stringResource(id = R.string.currency_convert),
+//                            style = MaterialTheme.typography.titleLarge
+//                        )
+//                        Icon(
+//                            imageVector = Icons.Default.CurrencyExchange,
+//                            contentDescription = stringResource(id = R.string.currency_convert),
+//                            modifier = Modifier.size(20.dp)
+//                        )
+//                    }
+//                }
+                IconButton(
                     onClick = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
+                    colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.background,
                         containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    modifier = Modifier.size(64.dp),
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.currency_convert),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Icon(
-                            imageVector = Icons.Default.CurrencyExchange,
-                            contentDescription = stringResource(id = R.string.currency_convert),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.CurrencyExchange,
+                        contentDescription = stringResource(id = R.string.currency_convert),
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
