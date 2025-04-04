@@ -31,6 +31,8 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color.Black,
     onPrimaryContainer = Color.DarkGray,
     surfaceContainer = LighterGrayColor,
+    onSurfaceVariant = LightestGrayColor,
+    inverseOnSurface = Gray_300,
     tertiaryContainer = LightGrayColor,
     onTertiaryContainer = LightGrayColor,
     error = ErrorColor
@@ -50,7 +52,7 @@ fun NerkhbazTheme(
         }
 
         darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> DarkColorScheme //LightColorScheme
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

@@ -58,5 +58,6 @@
     <string name="select">انتخاب</string>
     <string name="toman_currency">تومان ایران</string>
     <string name="back">بازگشت</string>
+    <string name="last_price">آخرین قیمت: %s تومان</string>
 
 </resources>
