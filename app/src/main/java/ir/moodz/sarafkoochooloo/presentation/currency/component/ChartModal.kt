@@ -9,16 +9,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,8 +46,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -59,8 +53,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.content.res.ResourcesCompat
 import ir.moodz.sarafkoochooloo.R
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.util.MockData
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme

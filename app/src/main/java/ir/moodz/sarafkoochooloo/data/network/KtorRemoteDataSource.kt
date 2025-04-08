@@ -6,12 +6,16 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.Parameters
+import ir.moodz.sarafkoochooloo.data.mapper.asDomain
 import ir.moodz.sarafkoochooloo.data.mapper.toCurrency
+import ir.moodz.sarafkoochooloo.data.network.model.CheckUpdateDataDto
+import ir.moodz.sarafkoochooloo.data.network.model.CheckUpdateResponseDto
 import ir.moodz.sarafkoochooloo.data.network.model.CurrenciesDetailResponseDto
 import ir.moodz.sarafkoochooloo.data.network.model.CurrenciesResponseDto
 import ir.moodz.sarafkoochooloo.data.network.util.constructRoute
 import ir.moodz.sarafkoochooloo.data.network.util.safeCall
-import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.CheckUpdate
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 import ir.moodz.sarafkoochooloo.domain.remote.RemoteDataSource
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
@@ -55,5 +59,23 @@ class KtorRemoteDataSource(
                 )
             }
         }.map { it.currencyDetailData.detailedCurrencyPrices.map { it.toCurrency() } }
+    }
+
+    override suspend fun isAppVersionValid(versionCode: Int): Result<CheckUpdate, DataError.Network> {
+        return safeCall<CheckUpdateDataDto> {
+            httpClient.post {
+                url(constructRoute("/checkUpdateSaraf"))
+                setBody(
+                    FormDataContent(
+                        Parameters.build {
+                            append(
+                                name = "version_code",
+                                value = versionCode.toString()
+                            )
+                        }
+                    )
+                )
+            }
+        }.map { it.data.update.asDomain() }
     }
 }

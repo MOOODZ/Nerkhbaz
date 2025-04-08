@@ -3,8 +3,8 @@ package ir.moodz.sarafkoochooloo.data.mapper
 import ir.moodz.sarafkoochooloo.data.local.entity.CurrencyEntity
 import ir.moodz.sarafkoochooloo.data.mapper.util.DateMapper
 import ir.moodz.sarafkoochooloo.data.network.model.PriceDto
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 
 fun PriceDto.toCurrency() : Currency {
     return Currency(

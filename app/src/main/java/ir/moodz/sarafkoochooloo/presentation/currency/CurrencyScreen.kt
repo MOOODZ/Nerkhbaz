@@ -2,6 +2,7 @@
 
 package ir.moodz.sarafkoochooloo.presentation.currency
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
@@ -21,11 +22,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Paid
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -39,8 +37,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,17 +50,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.moodz.sarafkoochooloo.R
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
-import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ChartModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.UpdateModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.Gray_300
@@ -93,7 +99,7 @@ fun CurrencyScreen(
     val scope = rememberCoroutineScope()
 
     ObserveAsEvents(event) { event ->
-        when(event){
+        when (event) {
             is CurrencyEvent.Error -> {
                 scope.launch {
                     snackbarHostState.currentSnackbarData?.dismiss()
@@ -109,7 +115,7 @@ fun CurrencyScreen(
     val convertCurrencySheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    if (state.isConvertCurrencyModalVisible){
+    if (state.isConvertCurrencyModalVisible) {
         ConvertModal(
             onDismiss = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
             sheetState = convertCurrencySheetState,
@@ -121,7 +127,7 @@ fun CurrencyScreen(
     val currencyChartSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    if (state.isChartModalVisible){
+    if (state.isChartModalVisible) {
         ChartModal(
             sheetState = currencyChartSheetState,
             onDismiss = { onAction(CurrencyAction.OnToggleChartModalDismiss) },
@@ -131,6 +137,23 @@ fun CurrencyScreen(
         )
     }
 
+    val openAppUpdateIntent = Intent(
+        Intent.ACTION_VIEW,
+        state.updateUrl.toUri()
+    )
+    if (state.isAppNeedToUpdate) {
+        UpdateModal(
+            onDismiss = { /*Force Update can not be dismissed */ },
+            onUpdateClick = {
+                context.startActivity(openAppUpdateIntent)
+            }
+        )
+    }
+
+    val topAppBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        state = topAppBarState
+    )
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -141,11 +164,36 @@ fun CurrencyScreen(
                 )
             }
         },
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "قیمت لحظه ای",
+                            style = MaterialTheme.typography.headlineLarge
+                        )
+                        Text(
+                            text = "نرخ ارز، سکه و طلا",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
         content = { innerPadding ->
             PullToRefreshBox(
                 state = state.pullToRefreshState,
                 modifier = Modifier
                     .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
                     .padding(innerPadding),
                 isRefreshing = state.isLoading,
                 onRefresh = { onAction(CurrencyAction.OnPullDownRefresh) }
@@ -186,11 +234,10 @@ fun CurrencyScreen(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(16.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                                    ,
+                                        .background(MaterialTheme.colorScheme.surfaceContainer),
                                     contentAlignment = Alignment.Center,
                                     content = {
-                                        if (currency.info.iconResId != null){
+                                        if (currency.info.iconResId != null) {
                                             Icon(
                                                 painter = painterResource(id = currency.info.iconResId),
                                                 contentDescription = null,
@@ -237,33 +284,6 @@ fun CurrencyScreen(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-//                Button (
-//                    onClick = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
-//                    shape = RoundedCornerShape(16.dp),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp),
-//                    contentPadding = PaddingValues(vertical = 16.dp),
-//                    colors = ButtonDefaults.buttonColors(
-//                        contentColor = MaterialTheme.colorScheme.background,
-//                        containerColor = MaterialTheme.colorScheme.primary
-//                    )
-//                ) {
-//                    Row(
-//                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Text(
-//                            text = stringResource(id = R.string.currency_convert),
-//                            style = MaterialTheme.typography.titleLarge
-//                        )
-//                        Icon(
-//                            imageVector = Icons.Default.CurrencyExchange,
-//                            contentDescription = stringResource(id = R.string.currency_convert),
-//                            modifier = Modifier.size(20.dp)
-//                        )
-//                    }
-//                }
                 IconButton(
                     onClick = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
                     colors = IconButtonDefaults.iconButtonColors(
@@ -273,7 +293,7 @@ fun CurrencyScreen(
                     modifier = Modifier.size(64.dp),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.CurrencyExchange,
+                        painter = painterResource(id = R.drawable.ic_exchange),
                         contentDescription = stringResource(id = R.string.currency_convert),
                         modifier = Modifier.size(24.dp)
                     )

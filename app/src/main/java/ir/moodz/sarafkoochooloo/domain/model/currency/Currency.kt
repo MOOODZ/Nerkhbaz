@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.domain.model
+package ir.moodz.sarafkoochooloo.domain.model.currency
 
 typealias Day = Int
 typealias Month = Int
@@ -7,4 +7,3 @@ data class Currency(
     val currentPrice: Int,
     val updatedDate: Pair<Month, Day>,
 )
-

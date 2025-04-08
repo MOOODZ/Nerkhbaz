@@ -1,4 +1,4 @@
-package ir.moodz.sarafkoochooloo.domain.model
+package ir.moodz.sarafkoochooloo.domain.model.currency
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

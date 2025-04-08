@@ -70,7 +70,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import ir.moodz.sarafkoochooloo.R
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyAction
 import ir.moodz.sarafkoochooloo.presentation.currency.CurrencyState
 import ir.moodz.sarafkoochooloo.presentation.util.DigitsNumber

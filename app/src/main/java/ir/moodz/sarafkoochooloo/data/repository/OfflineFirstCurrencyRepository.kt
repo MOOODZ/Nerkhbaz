@@ -1,8 +1,8 @@
 package ir.moodz.sarafkoochooloo.data.repository
 
 import ir.moodz.sarafkoochooloo.domain.local.LocalDataSource
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.domain.remote.RemoteDataSource
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.DataError

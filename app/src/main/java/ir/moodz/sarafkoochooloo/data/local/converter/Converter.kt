@@ -1,7 +1,7 @@
 package ir.moodz.sarafkoochooloo.data.local.converter
 
 import androidx.room.TypeConverter
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyType
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyType
 
 class Converter {
     @TypeConverter

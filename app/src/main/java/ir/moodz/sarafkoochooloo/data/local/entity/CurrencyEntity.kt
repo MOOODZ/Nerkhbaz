@@ -2,7 +2,7 @@ package ir.moodz.sarafkoochooloo.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyType
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyType
 
 @Entity(tableName = "Currencies")
 data class CurrencyEntity(

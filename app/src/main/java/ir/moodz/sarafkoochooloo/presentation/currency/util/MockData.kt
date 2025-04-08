@@ -1,7 +1,7 @@
 package ir.moodz.sarafkoochooloo.presentation.currency.util
 
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo.UnitedStatesDollar
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo.UnitedStatesDollar
 
 object MockData {
     val chart = listOf(

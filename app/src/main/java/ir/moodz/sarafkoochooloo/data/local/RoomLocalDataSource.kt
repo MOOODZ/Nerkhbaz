@@ -5,7 +5,7 @@ import ir.moodz.sarafkoochooloo.data.local.dao.CurrencyDao
 import ir.moodz.sarafkoochooloo.data.mapper.toCurrency
 import ir.moodz.sarafkoochooloo.data.mapper.toCurrencyEntity
 import ir.moodz.sarafkoochooloo.domain.local.LocalDataSource
-import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
 import kotlinx.coroutines.flow.Flow

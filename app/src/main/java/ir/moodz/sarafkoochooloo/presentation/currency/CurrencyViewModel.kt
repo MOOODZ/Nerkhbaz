@@ -7,8 +7,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.moodz.sarafkoochooloo.domain.model.Currency
-import ir.moodz.sarafkoochooloo.domain.model.CurrencyInfo
+import ir.moodz.sarafkoochooloo.BuildConfig
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
+import ir.moodz.sarafkoochooloo.domain.remote.RemoteDataSource
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.CurrencyConverter
 import ir.moodz.sarafkoochooloo.domain.util.asUiText
@@ -31,24 +33,23 @@ import timber.log.Timber
 
 class CurrencyViewModel(
     private val repository: CurrenciesRepository,
-    private val navigator: Navigator
+    private val navigator: Navigator,
+    private val remoteDataSource: RemoteDataSource
 ) : ViewModel() {
 
     private val _events = Channel<CurrencyEvent>()
     val events = _events.receiveAsFlow()
 
     private var chartScope: Job? = null
-    private var lastFetchTryTimeStamp: Long = System.currentTimeMillis()
 
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(CurrencyState())
     val state = _state
         .onStart {
-            if (isFiveMinutesPassed()){
-                fetchCurrencies()
-            }
+            fetchCurrencies()
             if (!hasLoadedInitialData) {
+//                checkAppVersionValidationForUpdate()
                 getMainCurrencies()
                 getCurrenciesWithToman()
                 updateScrollingDownBehavior()
@@ -126,15 +127,24 @@ class CurrencyViewModel(
                     )
                 }
             }
+
         }
     }
 
-    private fun isFiveMinutesPassed(): Boolean {
-        return if (System.currentTimeMillis() - lastFetchTryTimeStamp >= 5 * 60 * 1000) {
-            lastFetchTryTimeStamp = System.currentTimeMillis()
-            true
-        } else {
-            false
+    private fun checkAppVersionValidationForUpdate() {
+        viewModelScope.launch {
+            remoteDataSource.isAppVersionValid(
+                versionCode = BuildConfig.VERSION_CODE
+            )
+                .onSuccess { result ->
+                    _state.update { it.copy(
+                        isAppNeedToUpdate = result.isUpdatedNeeded,
+                        updateUrl = result.updateUrl
+                    ) }
+                }
+                .onError {
+                    // TODO : Handle update error
+                }
         }
     }
 
@@ -212,20 +222,6 @@ class CurrencyViewModel(
             return false
         }
         return true
-    }
-
-    private fun setupCurrencyListsBeforeUpdatingMainList(currencies: List<Currency>) {
-        _state.update {
-            it.copy(
-                currenciesWithToman = currencies,
-                // We need sorted currencies with Ids in our convert modal
-                currencyIds = currencies
-                    .sortedWith(
-                        compareByDescending<Currency> { it.info.type }
-                            .thenBy { it.info.id }
-                    ).map { it.info.id }
-            )
-        }
     }
 
     private fun calculateDestinationCurrency(

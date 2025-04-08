@@ -1,6 +1,6 @@
 package ir.moodz.sarafkoochooloo.presentation.currency
 
-import ir.moodz.sarafkoochooloo.domain.model.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 
 sealed interface CurrencyAction {
     data object OnPullDownRefresh : CurrencyAction

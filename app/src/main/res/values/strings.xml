@@ -59,5 +59,8 @@
     <string name="toman_currency">تومان ایران</string>
     <string name="back">بازگشت</string>
     <string name="last_price">آخرین قیمت: %s تومان</string>
+    <string name="update_detail">لطفاً برای بهرمندی بهتر از نرخ باز، نسخه جدید را دریافت کنید</string>
+    <string name="update_title">به روزرسانی برنامه</string>
+    <string name="update">به روزرسانی</string>
 
 </resources>
