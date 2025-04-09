@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Nerkhbaz</string>
+    <string name="app_name">نرخ باز</string>
 
     <string name="usd">دلار آمریکا</string>
     <string name="gel">لاری گرجستان</string>
@@ -62,5 +62,7 @@
     <string name="update_detail">لطفاً برای بهرمندی بهتر از نرخ باز، نسخه جدید را دریافت کنید</string>
     <string name="update_title">به روزرسانی برنامه</string>
     <string name="update">به روزرسانی</string>
+    <string name="precise">قیمت لحظه ای</string>
+    <string name="currencies_coin_gold">نرخ ارز، سکه و طلا</string>
 
 </resources>

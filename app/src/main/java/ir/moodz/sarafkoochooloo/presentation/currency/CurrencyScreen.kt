@@ -3,6 +3,7 @@
 package ir.moodz.sarafkoochooloo.presentation.currency
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
@@ -168,6 +169,8 @@ fun CurrencyScreen(
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
                 ),
                 title = {
                     Row(
@@ -175,11 +178,11 @@ fun CurrencyScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "قیمت لحظه ای",
+                            text = stringResource(R.string.precise),
                             style = MaterialTheme.typography.headlineLarge
                         )
                         Text(
-                            text = "نرخ ارز، سکه و طلا",
+                            text = stringResource(R.string.currencies_coin_gold),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
@@ -333,7 +336,9 @@ private fun NerkhbazSnackbarError (
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 private fun Preview() {

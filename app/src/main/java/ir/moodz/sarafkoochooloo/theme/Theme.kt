@@ -1,6 +1,10 @@
 package ir.moodz.sarafkoochooloo.theme
 
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.LocalActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,7 +13,9 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -40,18 +46,47 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun NerkhbazTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    isDarkMode: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val statusBarLight = Color.Black.toArgb()
+    val statusBarDark = Color.Black.toArgb()
+    val navigationBarLight = Color.Black.toArgb()
+    val navigationBarDark = Color.Black.toArgb()
+    val activity = LocalActivity.current as ComponentActivity
+    DisposableEffect(isDarkMode) {
+        activity.enableEdgeToEdge(
+            statusBarStyle = if (!isDarkMode) {
+                SystemBarStyle.light(
+                    statusBarLight,
+                    statusBarDark
+                )
+            } else {
+                SystemBarStyle.dark(
+                    statusBarDark
+                )
+            },
+            navigationBarStyle = if(!isDarkMode){
+                SystemBarStyle.light(
+                    navigationBarLight,
+                    navigationBarDark
+                )
+            } else {
+                SystemBarStyle.dark(navigationBarDark)
+            }
+        )
+
+        onDispose { }
+    }
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        isDarkMode -> DarkColorScheme
         else -> DarkColorScheme //LightColorScheme
     }
 

@@ -49,7 +49,7 @@ class CurrencyViewModel(
         .onStart {
             fetchCurrencies()
             if (!hasLoadedInitialData) {
-//                checkAppVersionValidationForUpdate()
+                checkAppVersionValidationForUpdate()
                 getMainCurrencies()
                 getCurrenciesWithToman()
                 updateScrollingDownBehavior()
