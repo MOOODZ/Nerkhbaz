@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -57,6 +58,8 @@ import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.util.MockData
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
+import ir.moodz.sarafkoochooloo.theme.ChartGreenDark
+import ir.moodz.sarafkoochooloo.theme.ChartGreenLight
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
 @Composable
@@ -67,7 +70,7 @@ fun ChartModal(
     currencies: List<Currency> = emptyList(),
     selectedCurrency: Currency?,
     isLoading: Boolean = false,
-    graphColor: Color = Color.Green
+    graphColor: Color = if (isSystemInDarkTheme()) ChartGreenDark else ChartGreenLight
 ) {
     val spacing = LocalConfiguration.current.screenHeightDp * 0.15f
     val transparentGraphColor = remember {
@@ -255,26 +258,6 @@ fun ChartModal(
                     }
                 }
             }
-//            bottomBar = {
-//                Button(
-//                    onClick = { onDismiss() },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(16.dp),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = MaterialTheme.colorScheme.primary,
-//                        contentColor = MaterialTheme.colorScheme.background
-//                    ),
-//                    contentPadding = PaddingValues(16.dp),
-//                    shape = RoundedCornerShape(10.dp)
-//                ) {
-//                    Text(
-//                        text = stringResource(id = R.string.back),
-//                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-//                        textAlign = TextAlign.Center
-//                    )
-//                }
-//            }
         )
     }
 }

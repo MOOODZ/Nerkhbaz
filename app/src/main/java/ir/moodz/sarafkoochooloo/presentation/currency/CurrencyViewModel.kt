@@ -128,6 +128,9 @@ class CurrencyViewModel(
                 }
             }
 
+            CurrencyAction.OnToggleCurrencySourceInfoModal -> {
+                _state.update { it.copy(isSourceModalVisible = !state.value.isSourceModalVisible) }
+            }
         }
     }
 

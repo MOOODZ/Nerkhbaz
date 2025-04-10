@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,10 +35,10 @@ import ir.moodz.sarafkoochooloo.R
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 
 @Composable
-fun UpdateModal(
+fun SourceModal(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onUpdateClick: () -> Unit
+    onSiteViewClick: () -> Unit
 ) {
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr
@@ -52,36 +52,28 @@ fun UpdateModal(
                 Column(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = stringResource(R.string.update_title),
+                            text = stringResource(R.string.currency_source),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleLarge
                         )
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Icon(
-                            imageVector = Icons.Default.RocketLaunch,
+                            imageVector = Icons.Default.Public,
                             contentDescription = null,
-                            modifier = Modifier.graphicsLayer(scaleX = -1f),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Spacer(Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(R.string.update_detail),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     Button(
-                        onClick = { onUpdateClick() },
+                        onClick = { onSiteViewClick() },
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(vertical = 8.dp),
@@ -91,7 +83,7 @@ fun UpdateModal(
                         )
                     ) {
                         Text(
-                            text = stringResource(R.string.update),
+                            text = stringResource(R.string.tasnim_news),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontSize = 14.sp
                             )
@@ -105,10 +97,10 @@ fun UpdateModal(
 
 @Preview
 @Composable
-private fun UpdateModalPreview() {
+private fun SourceModalPreview() {
     NerkhbazTheme {
-        UpdateModal(
-            onUpdateClick = {},
+        SourceModal(
+            onSiteViewClick = {},
             onDismiss = {}
         )
     }

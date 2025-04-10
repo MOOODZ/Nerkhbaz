@@ -64,5 +64,7 @@
     <string name="update">به روزرسانی</string>
     <string name="precise">قیمت لحظه ای</string>
     <string name="currencies_coin_gold">نرخ ارز، سکه و طلا</string>
+    <string name="currency_source">منبع نرخ ها</string>
+    <string name="tasnim_news">خبرگزاری تسنیم</string>
 
 </resources>

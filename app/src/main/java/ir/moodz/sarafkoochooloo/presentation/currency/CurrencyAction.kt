@@ -13,4 +13,5 @@ sealed interface CurrencyAction {
     data object OnToggleDestinationCurrencyModal : CurrencyAction
     data class OnCurrencyChartClick(val currency: Currency) : CurrencyAction
     data object OnToggleChartModalDismiss : CurrencyAction
+    data object OnToggleCurrencySourceInfoModal : CurrencyAction
 }

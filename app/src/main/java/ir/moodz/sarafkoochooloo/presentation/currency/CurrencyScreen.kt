@@ -13,24 +13,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -40,7 +44,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
@@ -65,11 +68,10 @@ import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ChartModal
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.SourceModal
 import ir.moodz.sarafkoochooloo.presentation.currency.component.UpdateModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
 import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
-import ir.moodz.sarafkoochooloo.theme.Gray_300
-import ir.moodz.sarafkoochooloo.theme.LightestGrayColor
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -151,8 +153,23 @@ fun CurrencyScreen(
         )
     }
 
+    val openCurrencySourceIntent = Intent(
+        Intent.ACTION_VIEW,
+        "https://www.tasnimnews.com/fa/currency".toUri()
+    )
+    if (state.isSourceModalVisible){
+        SourceModal(
+            onDismiss = {
+                onAction(CurrencyAction.OnToggleCurrencySourceInfoModal)
+            },
+            onSiteViewClick = {
+                context.startActivity(openCurrencySourceIntent)
+            }
+        )
+    }
+
     val topAppBarState = rememberTopAppBarState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         state = topAppBarState
     )
     Scaffold(
@@ -170,7 +187,7 @@ fun CurrencyScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    scrolledContainerColor = MaterialTheme.colorScheme.background
+                    scrolledContainerColor = Color.Transparent
                 ),
                 title = {
                     Row(
@@ -188,39 +205,52 @@ fun CurrencyScreen(
                         )
                     }
                 },
+                actions = {
+                    IconButton(
+                        onClick = { onAction(CurrencyAction.OnToggleCurrencySourceInfoModal) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "currency source info"
+                        )
+                    }
+                },
                 scrollBehavior = scrollBehavior
             )
         },
+        contentWindowInsets = WindowInsets.safeContent,
         content = { innerPadding ->
             PullToRefreshBox(
-                state = state.pullToRefreshState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .padding(innerPadding),
                 isRefreshing = state.isLoading,
                 onRefresh = { onAction(CurrencyAction.OnPullDownRefresh) }
             ) {
                 LazyColumn(
                     state = state.lazyListState,
-                    contentPadding = PaddingValues(8.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = innerPadding,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    items(
+                    itemsIndexed (
                         items = state.currencies,
-                        key = { it.info.title }
-                    ) { currency ->
+                        key = { _ , currency -> currency.info.title }
+                    ) { index , currency ->
                         val animatedCurrentPrice by animateIntAsState(
                             targetValue = currency.currentPrice,
                             animationSpec = tween(durationMillis = 1000)
                         )
                         ListItem(
                             modifier = Modifier
+                                .padding(vertical = 4.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .clickable {
                                     onAction(CurrencyAction.OnCurrencyChartClick(currency))
                                 },
+                            colors = ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.background
+                            ),
                             shadowElevation = 12.dp,
                             headlineContent = {
                                 Text(
@@ -244,11 +274,11 @@ fun CurrencyScreen(
                                             Icon(
                                                 painter = painterResource(id = currency.info.iconResId),
                                                 contentDescription = null,
-                                                tint = LightestGrayColor,
+                                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                                 modifier = Modifier
                                                     .padding(
-                                                        vertical = 8.dp,
-                                                        horizontal = 12.dp
+                                                        vertical = 12.dp,
+                                                        horizontal = 16.dp
                                                     )
                                                     .size(25.dp)
                                             )
@@ -256,11 +286,11 @@ fun CurrencyScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Paid,
                                                 contentDescription = null,
-                                                tint = LightestGrayColor,
+                                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                                 modifier = Modifier
                                                     .padding(
-                                                        vertical = 8.dp,
-                                                        horizontal = 12.dp
+                                                        vertical = 12.dp,
+                                                        horizontal = 16.dp
                                                     )
                                                     .size(25.dp)
                                             )
@@ -272,10 +302,13 @@ fun CurrencyScreen(
                                 Text(
                                     text = stringResource(id = currency.info.stringResId),
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = Gray_300
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                         )
+                        if (index < state.currencies.lastIndex) {
+                            HorizontalDivider()
+                        }
                     }
                 }
             }
@@ -290,7 +323,7 @@ fun CurrencyScreen(
                 IconButton(
                     onClick = { onAction(CurrencyAction.OnToggleConvertCurrencyModal) },
                     colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.background,
+                        contentColor = Color.Black,
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
                     modifier = Modifier.size(64.dp),

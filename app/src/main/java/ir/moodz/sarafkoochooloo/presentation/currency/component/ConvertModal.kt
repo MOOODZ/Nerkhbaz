@@ -335,7 +335,7 @@ private fun SelectCurrencyModal(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.background
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 contentPadding = PaddingValues(16.dp),
                 shape = RoundedCornerShape(10.dp)
