@@ -34,6 +34,8 @@ This is a financial market application that delivers the latest currency exchang
 
 **Koin:** For dependency injection
 
+**Room:** Database
+
 **Timber:** A logger with a small, extensible API.
 
 **Turbine:** A small testing library for kotlinx.coroutines Flow
