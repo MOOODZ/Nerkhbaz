@@ -1,4 +1,4 @@
-# 💰Nerkhbaz 
+<h1 align="center">Nerkhbaz</h1>
 
 This is a financial market application that delivers the latest currency exchange rates and gold prices in Iran with high accuracy and reliability. Built with a strong focus on performance and user experience, it provides users with fast, smooth, and up-to-date financial data.
 
