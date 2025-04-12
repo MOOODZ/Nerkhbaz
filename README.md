@@ -24,7 +24,7 @@ This is a financial market application that delivers the latest currency exchang
     
     **Data** -> **Domain** <- **Presentation**
 
-  - **MVI & MVVI Architecture Together**: States - Actions - Events - ViewModel
+  - **MVI & MVVM Architecture Together**: States - Actions - Events - ViewModel
 
 **Ktor:** Handled REST APIs and network data
 
