@@ -51,9 +51,10 @@ suspend inline fun <reified T> responseToResult(response: HttpResponse): Result<
 }
 
 fun constructRoute(route: String): String{
+    val baseUrl = "https://moodz.ir/backend/api/v1/store"
     return when{
-        route.contains(BuildConfig.BASE_URL) -> route
-        route.startsWith("/") -> BuildConfig.BASE_URL + route
-        else -> BuildConfig.BASE_URL + "/$route"
+        route.contains(baseUrl) -> route
+        route.startsWith("/") -> baseUrl + route
+        else -> "$baseUrl/$route"
     }
 }
