@@ -5,14 +5,9 @@ package ir.moodz.sarafkoochooloo.presentation.currency
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,15 +21,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -53,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -68,10 +59,10 @@ import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
 import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ChartModal
 import ir.moodz.sarafkoochooloo.presentation.currency.component.ConvertModal
+import ir.moodz.sarafkoochooloo.presentation.currency.component.CurrencyItem
 import ir.moodz.sarafkoochooloo.presentation.currency.component.SourceModal
 import ir.moodz.sarafkoochooloo.presentation.currency.component.UpdateModal
 import ir.moodz.sarafkoochooloo.presentation.util.ObserveAsEvents
-import ir.moodz.sarafkoochooloo.presentation.util.toThousandSeparator
 import ir.moodz.sarafkoochooloo.theme.NerkhbazTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -237,73 +228,10 @@ fun CurrencyScreen(
                         items = state.currencies,
                         key = { _ , currency -> currency.info.title }
                     ) { index , currency ->
-                        val animatedCurrentPrice by animateIntAsState(
-                            targetValue = currency.currentPrice,
-                            animationSpec = tween(durationMillis = 1000)
-                        )
-                        ListItem(
-                            modifier = Modifier
-                                .padding(vertical = 4.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable {
-                                    onAction(CurrencyAction.OnCurrencyChartClick(currency))
-                                },
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.background
-                            ),
-                            shadowElevation = 12.dp,
-                            headlineContent = {
-                                Text(
-                                    text = stringResource(
-                                        R.string.toman,
-                                        animatedCurrentPrice.toThousandSeparator()
-                                    ),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-
-                            },
-                            leadingContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceContainer),
-                                    contentAlignment = Alignment.Center,
-                                    content = {
-                                        if (currency.info.iconResId != null) {
-                                            Icon(
-                                                painter = painterResource(id = currency.info.iconResId),
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                                                modifier = Modifier
-                                                    .padding(
-                                                        vertical = 12.dp,
-                                                        horizontal = 16.dp
-                                                    )
-                                                    .size(25.dp)
-                                            )
-                                        } else {
-                                            Icon(
-                                                imageVector = Icons.Default.Paid,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                                                modifier = Modifier
-                                                    .padding(
-                                                        vertical = 12.dp,
-                                                        horizontal = 16.dp
-                                                    )
-                                                    .size(25.dp)
-                                            )
-                                        }
-                                    }
-                                )
-                            },
-                            trailingContent = {
-                                Text(
-                                    text = stringResource(id = currency.info.stringResId),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
+                        CurrencyItem(
+                            currency = currency,
+                            onClick = {
+                                onAction(CurrencyAction.OnCurrencyChartClick(currency))
                             }
                         )
                         if (index < state.currencies.lastIndex) {
@@ -382,7 +310,7 @@ private fun Preview() {
                     Currency(
                         info = CurrencyInfo.UnitedStatesDollar,
                         currentPrice = 2000000,
-                        updatedDate = 12 to 12,
+                        date = 12 to 12,
                     )
                 )
             ),

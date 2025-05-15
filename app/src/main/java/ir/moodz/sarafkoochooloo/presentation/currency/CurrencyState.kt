@@ -2,6 +2,7 @@ package ir.moodz.sarafkoochooloo.presentation.currency
 
 import androidx.compose.foundation.lazy.LazyListState
 import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyDetail
 import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 
 data class CurrencyState(
@@ -18,7 +19,7 @@ data class CurrencyState(
     val destinationCurrencyAmount: String = "",
     val isStartingCurrencyModalVisible: Boolean = false,
     val isDestinationCurrencyModalVisible: Boolean = false,
-    val selectedCurrencyDays: List<Currency> = emptyList(),
+    val selectedCurrencyDays: List<CurrencyDetail> = emptyList(),
     val isChartLoading: Boolean = false,
     val isChartModalVisible: Boolean = false,
     val selectedDetailCurrency: Currency? = null,

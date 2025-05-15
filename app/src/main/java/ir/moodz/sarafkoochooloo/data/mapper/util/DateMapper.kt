@@ -27,6 +27,31 @@ object DateMapper{
         return 1 to 1
     }
 
+    fun mapPersianDateToNumberDate(date: String) : String{
+        val parts = date.split("/")
+        if (parts.size == 3) {
+            val year = parts[0]
+            val month = when (parts[1]) {
+                "فروردین" -> "01"
+                "اردیبهشت" -> "02"
+                "خرداد" -> "03"
+                "تیر" -> "04"
+                "مرداد" -> "05"
+                "شهریور" -> "06"
+                "مهر" -> "07"
+                "آبان" -> "08"
+                "آذر" -> "09"
+                "دی" -> "10"
+                "بهمن" -> "11"
+                "اسفند" -> "12"
+                else -> "00"
+            }
+            val day = parts[2].padEnd(2, '0')
+            return "$day/$month/$year"
+        }
+        return ""
+    }
+
     fun mapPairToPersianDate(monthDay: Pair<Int, Int>): String {
         val persianMonths = mapOf(
             1 to "فروردین",

@@ -1,19 +1,20 @@
 [versions]
-agp = "8.9.1"
+agp = "8.9.2"
 kotlin = "2.1.10"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.03.00"
-composeNavigation = "2.8.9"
+composeBom = "2025.05.00"
+composeNavigation = "2.9.0"
+composeMaterial3 = "1.4.0-alpha14"
 koin = "3.5.6"
 ktor = "2.3.12"
 ktorClientLogging = "2.3.12"
 timber = "5.0.1"
-room = "2.6.1"
+room = "2.7.1"
 ksp = "2.1.10-1.0.31"
 materialIconsExtended = "1.7.8"
 
@@ -31,7 +32,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" , version.ref = "composeMaterial3"}
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
@@ -57,7 +58,11 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 room = { id = "androidx.room", version.ref = "room" }
 
 [bundles]
-koin = ["koin-android", "koin-core", "koin-androidx-compose"]
+koin = [
+    "koin-android",
+    "koin-core",
+    "koin-androidx-compose"
+]
 ktor = [
     "ktor-client-auth",
     "ktor-client-cio",

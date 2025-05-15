@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -121,6 +126,7 @@ fun ConvertModal(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { onDismiss() },
+        containerColor = MaterialTheme.colorScheme.background,
         dragHandle = {}
     ) {
         Scaffold(
@@ -140,6 +146,9 @@ fun ConvertModal(
                                     .fillMaxWidth(),
                             )
                         },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.background
+                        ),
                         navigationIcon = {
                             IconButton(
                                 onClick = { onDismiss() },
@@ -155,6 +164,7 @@ fun ConvertModal(
                     )
                 }
             },
+            contentWindowInsets = WindowInsets.safeDrawing.exclude(WindowInsets.statusBars),
             content = { innerPadding ->
                 Column(
                     modifier = modifier
@@ -452,7 +462,8 @@ private fun ConvertModalPreview() {
             sheetState = SheetState(
                 skipPartiallyExpanded = true,
                 initialValue = SheetValue.Expanded,
-                density = LocalDensity.current
+                positionalThreshold = { 200f },
+                velocityThreshold = { 200f }
             ),
             onAction = {}
         )

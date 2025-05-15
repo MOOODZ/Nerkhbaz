@@ -1,22 +1,14 @@
 package ir.moodz.sarafkoochooloo.data.network.util
 
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
+import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
-import ir.moodz.sarafkoochooloo.BuildConfig
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.SerializationException
 import timber.log.Timber
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 suspend inline fun <reified T> safeCall (execute: () -> HttpResponse): Result<T, DataError.Network>{
@@ -28,6 +20,9 @@ suspend inline fun <reified T> safeCall (execute: () -> HttpResponse): Result<T,
     } catch (e: SerializationException){
         Timber.e(e)
         return Result.Error(DataError.Network.SERIALIZATION)
+    } catch (e: ConnectTimeoutException){
+        Timber.e(e)
+        return Result.Error(DataError.Network.CONNECT_TIMEOUT)
     } catch (e: Exception){
         coroutineContext.ensureActive()
         Timber.e(e)
@@ -42,6 +37,7 @@ suspend inline fun <reified T> responseToResult(response: HttpResponse): Result<
         in 200..299 -> Result.Success(response.body<T>())
         401 -> Result.Error(DataError.Network.UNAUTHORIZED)
         408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+        404 -> Result.Error(DataError.Network.NOT_FOUND)
         409 -> Result.Error(DataError.Network.CONFLICT)
         413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)
         429 -> Result.Error(DataError.Network.TOO_MANY_REQUEST)

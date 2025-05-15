@@ -3,6 +3,7 @@ package ir.moodz.sarafkoochooloo.domain.util
 sealed interface DataError: Error {
     enum class Network: DataError{
         REQUEST_TIMEOUT,
+        CONNECT_TIMEOUT,
         UNAUTHORIZED,
         CONFLICT,
         TOO_MANY_REQUEST,
@@ -10,7 +11,8 @@ sealed interface DataError: Error {
         PAYLOAD_TOO_LARGE,
         SERVER_ERROR,
         SERIALIZATION,
-        UNKNOWN
+        UNKNOWN,
+        NOT_FOUND
     }
 
     enum class Local: DataError{

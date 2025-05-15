@@ -2,11 +2,14 @@ package ir.moodz.sarafkoochooloo.data.repository
 
 import ir.moodz.sarafkoochooloo.domain.local.LocalDataSource
 import ir.moodz.sarafkoochooloo.domain.model.currency.Currency
+import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyDetail
 import ir.moodz.sarafkoochooloo.domain.model.currency.CurrencyInfo
 import ir.moodz.sarafkoochooloo.domain.remote.RemoteDataSource
 import ir.moodz.sarafkoochooloo.domain.repository.CurrenciesRepository
 import ir.moodz.sarafkoochooloo.domain.util.DataError
 import ir.moodz.sarafkoochooloo.domain.util.Result
+import ir.moodz.sarafkoochooloo.domain.util.onError
+import ir.moodz.sarafkoochooloo.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +34,7 @@ class OfflineFirstCurrencyRepository(
                 Currency(
                     info = CurrencyInfo.IranToman,
                     currentPrice = 1,
-                    updatedDate = 12 to 12
+                    date = 12 to 12
                 )
             )
             // Needed different sorting for converting
@@ -58,8 +61,13 @@ class OfflineFirstCurrencyRepository(
 
     override suspend fun getCurrenciesByDays(
         currencyTitle: String
-    ): Result<List<Currency>, DataError> {
+    ): Result<List<CurrencyDetail>, DataError> {
         return remoteDataSource.getCurrencyInfoByDays(currencyTitle)
+            .onSuccess { currencies ->
+                val sortedCurrencies = currencies.sortedByDescending { it.sortId }
+                Result.Success(sortedCurrencies)
+            }
+            .onError { Result.Error(it) }
     }
 
     private fun removeInaccurateCurrencies(currencies: List<Currency>): List<Currency> {
