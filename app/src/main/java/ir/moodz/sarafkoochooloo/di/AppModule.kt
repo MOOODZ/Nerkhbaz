@@ -21,4 +21,7 @@ val appModule = module {
     }
 
     viewModelOf(::CurrencyViewModel)
+    single {
+
+    }
 }

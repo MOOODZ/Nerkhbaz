@@ -112,6 +112,8 @@ dependencies {
     // Timber
     implementation(libs.timber)
 
-
+    // Glance
+    implementation (libs.androidx.glance.appwidget)
+    implementation (libs.androidx.glance.material3)
 
 }
